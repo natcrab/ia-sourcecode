@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block site %}
+    {% with mes = get_flashed_messages() %}
+        {% for message in mes %}
+            <p>{{message}}</p>
+        {%endfor%}
+    {%endwith%}
+    <form action = "/" method = "post">
+        <div>
+            <button name = "make" type = "submit">Make your own poll</button>
+        </div>
+        <div>
+            <button name = "search" type = "submit">Find poll using ID </button>
+        </div>
+    </form>
+{% endblock %}

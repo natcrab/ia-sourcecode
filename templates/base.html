@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block site %}
+    {% with mes = get_flashed_messages() %}
+        {% for message in mes %}
+            <p>{{message}}</p>
+        {%endfor%}
+    {%endwith%}
+    <form action = "/" method = "post">
+        <div>
+            <button name = "login" type = "submit">Log in</button>
+        </div>
+        <div>
+            <button name = "signup" type = "submit"> Sign up </button>
+        </div>
+    </form>
+
+{% endblock %}
