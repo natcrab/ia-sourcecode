@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block site %}
+{% block maincontent %}
     {% with mes = get_flashed_messages() %}
         {% for message in mes %}
             <p>{{message}}</p>
@@ -10,11 +10,11 @@
         <div>
             <input id= "username" type= "text" name = "username" placeholder="Username: (max 20 characters)">
             <p>
-                Username must follows these standards:
-                  - No spaces
-                  - Only letters and numbers
-                  - At most 20 characters
-                  - Must be unique 
+                Username must follows these standards: <br>
+                  - No spaces <br>
+                  - Only letters and numbers <br>
+                  - At most 20 characters <br>
+                  - Must be unique <br>
             </p>
         </div>
         <div>
@@ -24,10 +24,10 @@
             <input id= "verify-password" type = "password" name = "verify-password" placeholder = "Confirm password:">
         </div>
         <p>
-            Password must follow these standards:
-            - Must include at least one capital letter
-            - Must be at least 8 characters
-            - Must include a symbol
+            Password must follow these standards: <br>
+            - Must include at least one capital letter <br>
+            - Must be at least 8 characters <br>
+            - Must include a symbol <br>
         </p>
         <div>
             <input id= "email" type = "text" name = "email" placeholder = "email(optional): ">

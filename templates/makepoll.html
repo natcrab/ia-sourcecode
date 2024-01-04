@@ -1,0 +1,24 @@
+{% extends "content.html"}
+{% block site %}
+<form>
+    <div>
+        <p>
+            Poll name: <br>
+        </p>
+        <input id= "pollName" type= "text" name = "pollName" placeholder = "Poll name:">
+    </div>
+    <div>
+        <p>
+            Poll id (a unique code that could be used to directly search for your poll): <br>
+        </p>
+        <input id= "pollID" type= "text" name = "pollID" placeholder = "Poll ID:">
+    </div>
+    <div>
+        <p>
+            Poll description (please show what this poll is about):
+        </p>
+        <textarea id= "pollDesc" type= "text" name = "pollDesc" placeholder="Description:">
+    </div>
+    <button name = "create" type = "submit">Create poll</button>
+</form>
+{%endblock%}

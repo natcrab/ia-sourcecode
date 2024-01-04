@@ -151,7 +151,25 @@ def login():
 def contentpage():
     if request.method == "GET":
         return render_template("content.html")
+    elif request.method == "POST":
+        if request.form.get("make") is not None:
+            return redirect("/makepoll")
+        elif request.form.get("search") is not None:
+            return redirect("/searchpoll")
     
+@app.route("/makepoll", methods = ["GET", "POST"])
+def makepoll():
+    if request.method == "GET":
+        return render_template("makepoll.html")
+    if request.method == "POST":
+        return render_template("makepoll.html")
+
+@app.route("/searchpoll", methods = ["GET", "POST"])  
+def searchpoll():
+    if request.method == "GET":
+        return render_template("searchpoll.html")
+    if request.method == "POST":
+        return render_template("searchpoll.html")
 #end of mainpage# 
 
 

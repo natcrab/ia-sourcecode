@@ -26,10 +26,10 @@ def valid_username(username):
 def valid_password(password):
     if (len(password) < 8 and len(password) > 0):
         return False
-    if not re.search(r"A-Z", password):
-        return False
-    if not re.search(r"\W", password):
-        return False
+    #if bool(re.search(r"A-Z", password))== False:
+       # return False
+    #if bool(re.search(r"\W", password)) == False:
+       # return False
     return True
 
 def get_password(engine, username, password):
