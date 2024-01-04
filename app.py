@@ -56,6 +56,34 @@ class Users(UserMixin, db.Model):
     password = db.Column(db.String(200))
     email = db.Column(db.String(256))
 
+class Polls(db.Model):
+    pollId = db.Column(db.String, primary_key=True, unique = True)
+    creator = db.Column(db.String(20))
+    privacyMode = db.Column(db.String(20))
+    votingMode = db.Column(db.String(20))
+    canViewWhileOngoing = db.Column(db.bool)
+    publicity = db.Column(db.bool)
+    timeRemaining = db.Column(db.Integer)
+    currentWinner = db.Column(db.String)
+    ongoing = db.Column(db.bool)
+    option1 = db.Column(db.String)
+    option2 = db.Column(db.String)
+    option3 = db.Column(db.String)
+    option4 = db.Column(db.String)
+    option5 = db.Column(db.String)
+    option6 = db.Column(db.String)
+    option7 = db.Column(db.String)
+    option8 = db.Column(db.String)
+    option9 = db.Column(db.String)
+    option10 = db.Column(db.String)
+
+
+class Votes(db.Model):
+    Userid = db.Column(db.Integer, primary_key=True)
+    pollid = db.Column(db.String)
+    voteoption = db.Column(db.String)
+    
+
 @manage.user_loader
 def load(userid):
     return Users.query.get(userid)
@@ -70,9 +98,15 @@ def after_request(r):
     return r
 #end of avoid caching
 
+@app.route("/", methods = ["GET", "POST"])
+def startup():
+    if request.method == "GET":
+        return redirect("/home")
+    else:
+        return "Oops, you aren't supposed to be here. It seems something had gone wrong"
 
 #base webpage#
-@app.route("/", methods = ["GET", "POST"])
+@app.route("/home", methods = ["GET", "POST"])
 def base():
     if request.method == "GET":
         return render_template("base.html")
@@ -81,6 +115,7 @@ def base():
             return redirect("/login")
         elif request.form.get("signup") is not None:
             return redirect("/register")
+        
 #end of base webpage#
 
 #register page#
@@ -147,24 +182,27 @@ def login():
 #login page end#
 
 #Contains page creation + a search bar that displays the name / id type into the search bar#
+@login_required
 @app.route("/main", methods = ["GET", "POST"])
 def contentpage():
     if request.method == "GET":
         return render_template("content.html")
     elif request.method == "POST":
         if request.form.get("make") is not None:
-            return redirect("/makepoll")
+            return redirect("/main/makepoll")
         elif request.form.get("search") is not None:
-            return redirect("/searchpoll")
-    
-@app.route("/makepoll", methods = ["GET", "POST"])
+            return redirect("/main/searchpoll")
+
+@login_required    
+@app.route("/main/makepoll", methods = ["GET", "POST"])
 def makepoll():
     if request.method == "GET":
         return render_template("makepoll.html")
     if request.method == "POST":
         return render_template("makepoll.html")
 
-@app.route("/searchpoll", methods = ["GET", "POST"])  
+@login_required
+@app.route("/main/searchpoll", methods = ["GET", "POST"])  
 def searchpoll():
     if request.method == "GET":
         return render_template("searchpoll.html")

@@ -1,5 +1,5 @@
-{% extends "content.html"}
-{% block site %}
+{% extends "content.html" %}
+{% block maincontent %}
 <form>
     <div>
         <p>
@@ -17,7 +17,8 @@
         <p>
             Poll description (please show what this poll is about):
         </p>
-        <textarea id= "pollDesc" type= "text" name = "pollDesc" placeholder="Description:">
+        <textarea id= "pollDesc" name = "pollDesc" placeholder="Description:" rows = 10 cols = 30>
+        </textarea>
     </div>
     <button name = "create" type = "submit">Create poll</button>
 </form>
