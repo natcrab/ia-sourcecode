@@ -38,3 +38,19 @@ def get_password(engine, username, password):
     for row in checkpass:
         return (check_password_hash(row.password, password))
         
+def duped_pollId(engine, pollId):
+    with engine.connect() as connection:
+        checkduplicates = connection.execute(text("SELECT pollId FROM polls WHERE pollId = :pollId LIMIT 1"), {'pollId': pollId})
+    for row in checkduplicates:   
+        if (pollId == row.pollId):
+            return True
+    return False
+
+def optioncountarr(optioncount):
+    optioncountarray = []
+    for i in range(optioncount):
+        optioncountarray.append(i+1)
+    return optioncountarray
+    
+def checkopts():
+    return "placeholder"

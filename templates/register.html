@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block maincontent %}
+{% block site %}
     {% with mes = get_flashed_messages() %}
         {% for message in mes %}
             <p>{{message}}</p>
@@ -8,7 +8,7 @@
     {%endwith%}
     <form action = "/register" method = "post">
         <div>
-            <input id= "username" type= "text" name = "username" placeholder="Username: (max 20 characters)">
+            <input id= "username" type= "text" name = "username" placeholder="Username:">
             <p>
                 Username must follows these standards: <br>
                   - No spaces <br>

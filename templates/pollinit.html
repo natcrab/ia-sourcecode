@@ -1,0 +1,17 @@
+{% extends "content.html" %}
+{% block maincontent %}
+    
+    <form action = "/main/makepoll" method = "post">
+        Number of options in the poll (at most 10 options): 
+        <input id= "optionsnum" type= "number" min = 2 max = 10 step = 1 name = "optionsnum" value = 2>
+        <br>
+        Password required? <br> 
+        <input id= "noPassword" type= "radio" name = "passwordReq" value = 0 checked>
+        <label for= "noPassword">No</label>
+        <br>
+        <input id= "yesPassword" type= "radio" name = "passwordReq" value = 1>
+        <label for="yesPassword">Yes</label>
+        <br>
+        <button name = "makepoll" type = "submit">Create poll</button>
+    </form>
+{% endblock %}

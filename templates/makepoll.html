@@ -1,18 +1,28 @@
 {% extends "content.html" %}
 {% block maincontent %}
-<form>
+<form action = "/main/makepoll" method = "post">
     <div>
         <p>
             Poll name: <br>
         </p>
-        <input id= "pollName" type= "text" name = "pollName" placeholder = "Poll name:">
+        <input id= "pollName" type= "text" name = "pollName" placeholder = "Poll name:" required>
     </div>
+
     <div>
         <p>
             Poll id (a unique code that could be used to directly search for your poll): <br>
         </p>
-        <input id= "pollID" type= "text" name = "pollID" placeholder = "Poll ID:">
+        <input id= "pollId" type= "text" name = "pollId" placeholder = "Poll ID:" required>
     </div>
+
+    {% if needPass == 1 %}
+    <div>
+        <p>
+            Poll password (a unique code that is required to vote on your poll, can be changed later): <br>
+        </p>
+        <input id= "pollPassword" type= "text" name = "pollPassword" placeholder = "Password:" required>
+    </div>
+    {% endif %}
     <div>
         <p>
             Poll description (please show what this poll is about):
@@ -20,6 +30,91 @@
         <textarea id= "pollDesc" name = "pollDesc" placeholder="Description:" rows = 10 cols = 30>
         </textarea>
     </div>
+
+    <div>
+        <p>
+            Poll question (What is the prompt for Polling):
+        </p>
+        <textarea id= "pollQuestion" name = "pollQuestion" placeholder="Description:" rows = 10 cols = 30>
+        </textarea>
+    </div>
+
+    <div>
+        {% for n in optioncount %}
+        Option {{n}}: <input id = "polloption{{n}}" name = "option{{n}}" required>
+            <br>
+            Provide justification/additional details for selecting option {{n}} to convince voters: <br>
+            <textarea id= "explain{{n}}" name = "explain{{n}}" rows = 10 cols = 30>
+            </textarea> 
+            <br>
+        {%endfor%}
+    </div>
+
+    <div>
+        <p>
+            Select your poll privacy type (note that for ethical purposes, voters can see which privacy option was selected)<br>
+        </p>
+        <input id= "pollShow" type= "radio" name = "pollPrivacy" value = "Show" checked>
+        <label for="pollShow">Show voters and their choices at the end</label>
+        <br>
+        <input id= "pollHalf" type= "radio" name = "pollPrivacy" value = "ShowHalf">
+        <label for="pollHalf">Show voters but not their choices at the end</label>
+        <br>
+        <input id= "pollHide" type= "radio" name = "pollPrivacy" value = "Hide">
+        <label for="pollHide">Do not show voters at the end</label>
+        <br>
+    </div>
+
+    <div>
+        <p>
+            Select if the poll is public or private:
+        </p>
+        <input id= "pollPublic" type= "radio" name = "pollPublicity" value = "True" checked>
+        <label for="pollPublic">Poll can be accessed through search or id</label>
+        <br>
+        <input id= "pollPrivate" type= "radio" name = "pollPublicity" value = "False">
+        <label for="pollPrivate">Poll can only be accessed through id</label>
+        <br>
+    </div>
+
+    <div>
+        <p>
+            Select if the poll result can be previewed while ongoing:
+        </p>
+        <input id= "pollView" type= "radio" name = "pollView" value = "True" checked>
+        <label for="pollView">Poll can be viewed while ongoing</label>
+        <br>
+        <input id= "pollNoView" type= "radio" name = "pollView" value = "False">
+        <label for="pollNoView">Poll can only be viewed when result is released</label>
+        <br>
+    </div>
+    <div>
+        <p>
+            Select which voting system to be used on the poll:
+        </p>
+        <input id= "Popularity" type= "radio" name = "voteSystem" value = "popularity" checked>
+        <label for="Popularity">Popularity</label>
+        <br>
+        <input id= "Tideman" type= "radio" name = "voteSystem" value = "tideman">
+        <label for="Tideman">Tideman</label>
+        <br>
+    </div>
+    
+    <div>
+        <p>
+            Select how long the poll would last (leave it at 00:00:00 to end the poll manually):
+        </p>
+        Days: <input id= "Days" type= "number" name = "timerDay" value = 0 min = 0 step = 1 max = 100>
+        Hours: <input id= "Hours" type= "number" min = 0 max = 24 step = 1 name = "timerHours" value = 0>
+        Minutes: <input id= "Minutes" type= "number" min = 0 max = 60 step = 1 name = "timerMinutes" value = 0>
+        Seconds: <input id= "Seconds" type= "number" min = 0 max = 60 step = 1 name = "timerSeconds" value = 0>
+
+        
+    </div>
+
+    <input id = "optcount" type= "number" name = "optcount" value = {{numopt}} hidden>
+    <input id = "passwordReq" type = "text" name = "passwordNeeded" value = "{{needPass}}" hidden>
+    <br>
     <button name = "create" type = "submit">Create poll</button>
 </form>
 {%endblock%}
