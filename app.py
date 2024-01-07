@@ -8,12 +8,21 @@ from func import (
     valid_password,
     get_password,
     duped_pollId,
+    getUsername,
     checkopts,
     optioncountarr
 )
+from voting import(
+    getpoll,
+    checkvoted,
+    optvoted,
+    tallying,
+    addCounter
+)
 from secretkey import keysec
-from flask import Flask, redirect, render_template, request, flash
+from flask import Flask, redirect, render_template, request, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func, text
 from sqlalchemy.engine import create_engine
 from werkzeug.security import generate_password_hash
 from flask_migrate import Migrate
@@ -64,19 +73,19 @@ class Polls(db.Model):
     creator = db.Column(db.String(20))
     pollname = db.Column(db.String)
     pollDescription = db.Column(db.String)
-    pollQuestion = db.Column(db.String)
+    pollQuestion = db.Column(db.String) #index 4
     privacyMode = db.Column(db.String)
     votingMode = db.Column(db.String)
     canViewWhileOngoing = db.Column(db.Boolean)
     publicity = db.Column(db.Boolean)
-    timeRemaining = db.Column(db.Integer)
+    timeRemaining = db.Column(db.Integer) #index 9
     pollManual = db.Column(db.Boolean)
     currentWinner = db.Column(db.String)
     NumofOptions = db.Column(db.Integer)
     needPassword = db.Column(db.Boolean)
-    password = db.Column(db.String(200))
+    password = db.Column(db.String(200)) #index14
     ongoing = db.Column(db.Boolean)
-    option1 = db.Column(db.String)
+    option1 = db.Column(db.String) #index 16
     option1exp = db.Column(db.String)
     option2 = db.Column(db.String)
     option2exp = db.Column(db.String)
@@ -99,7 +108,8 @@ class Polls(db.Model):
 
 
 class Votes(db.Model):
-    Userid = db.Column(db.Integer, primary_key=True)
+    Counter = db.Column(db.Integer, primary_key = True, unique = True)
+    Userid = db.Column(db.Integer)
     pollid = db.Column(db.String)
     voteoption = db.Column(db.String)
     
@@ -195,9 +205,9 @@ def login():
                 flash("username or password is incorrect!")
                 return redirect("/login")
             else:
-                login_user(Users.query.filter_by(username=username).first())
+                login_user(Users.query.filter(func.lower(Users.username)==username.lower()).first())
                 flash("log in success!")
-                flash(f"Welcome, {username}!")
+                flash(f"Welcome, {getUsername(engine, username)}!")
                 return redirect("/main")
 #login page end#
 
@@ -312,12 +322,59 @@ def makepoll():
 
 
 @login_required
-@app.route("/main/searchpoll", methods = ["GET", "POST"])  
+@app.route("/main/searchpoll/", methods = ["GET", "POST"])  
 def searchpoll():
     if request.method == "GET":
         return render_template("searchpoll.html")
     if request.method == "POST":
-        return render_template("searchpoll.html")
-#end of mainpage# 
+        if request.form.get("pollIdButton") is not None:
+            if request.form.get("searchPollId") == "":
+                return render_template("searchpoll.html")
+            else:
+                result = request.form.get("searchPollId")
+                return redirect(url_for("pollDisplay", pollId = result))
+        if request.form.get("pollNameButton") is not None:
+            return redirect("/main/polls")
 
+@login_required
+@app.route("/main/polls", methods = ["GET", "POST"])
+def searchresults():
+    if request.method == "GET":
+        return "1"
 
+@login_required
+@app.route("/main/polls/<pollId>", methods = ["GET", "POST"])
+def pollDisplay(pollId):
+    pollData = getpoll(engine, pollId)
+    if current_user.username == pollData[1]:
+        isOwner = True
+    else:
+        isOwner = False
+    if pollData[15]:
+        if request.method == "GET":
+            return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner)
+        if request.method == "POST":
+            if request.form.get("endpoll") is not None:
+                with engine.connect() as connection:
+                    connection.execute(text("UPDATE Polls Set ongoing = False WHERE pollid = :pollid"), {'pollid': pollId})
+                    connection.commit()
+                redirect(url_for("pollDisplay", pollId = pollId))
+            if pollData[6] == "popularity":
+                for i in range(pollData[12]):
+                    if request.form.get("".join(["option", str(i+1)])) is not None:
+                        if checkvoted(engine, current_user.id, pollId):
+                            with engine.connect() as connection:
+                                connection.execute(text("DELETE FROM Votes WHERE pollid = :pollid AND Userid = :userid"), {'pollid': pollId, 'userid': current_user.id})
+                                connection.commit()
+                        new = Votes(
+                            Counter = addCounter(),
+                            Userid = current_user.id,
+                            pollid = pollId,
+                            voteoption = "".join(["option", str(i+1)])
+                        )
+                        db.session.add(new)
+                        db.session.commit()
+                return redirect(url_for("pollDisplay", pollId = pollId))
+    else:
+        if request.method == "GET":
+            return render_template("pollresults.html", pollData = pollData, tallies = tallying(engine, pollId))

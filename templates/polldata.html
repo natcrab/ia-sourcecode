@@ -1,0 +1,57 @@
+{% extends "content.html" %}
+{% block maincontent %}
+<h3 id = "displayTop"> ID: {{pollData[0]}} <br>
+Maker: {{pollData[1]}} <br>
+</h3>
+<h1 id = "displayTitle"> {{pollData[2]}} <br> </h1>
+<h2 id = "displayDesc">
+{{pollData[4]}}
+</h2>
+<p>
+    {{pollData[3]}}
+</p>
+{% if pollData[5] == "Show" %}
+<p>
+    Note: Other people can see what you have voted for on this poll
+</p>
+{% elif pollData[5] == "ShowHalf" %}
+<p>
+    Note: Other people can see you have voted on this poll, but not what you voted for
+</p>
+{% elif pollData[5] == "Hide" %}
+<p>
+    Note: Your votes and participation on this poll will be private
+</p>
+{% endif %}
+<form action = "/main/polls/{{pollData[0]}}" method = "post"> 
+{% set n = namespace(value = 16) %}
+{% set x = namespace(value = 1) %}
+{% if pollData[6] == "popularity" %}
+{% for temp in range(pollData[12]|int) %}
+<div>
+<p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
+{% if voted == 0 %}
+<button type = "submit" name = "option{{x.value}}"> Vote </button> </p>
+{% elif voted == 1 %}
+{% if x.value == optvoted|int %}
+<button type = "button" name = "option{{x.value}}"> Voted </button> </p>
+{% else %}
+<button type = "submit" name = "option{{x.value}}"> Vote </button> </p>
+{% endif %}
+{% endif %}
+<br>
+Justification: {{pollData[n.value+1]}}
+{% set n.value = n.value + 2 %}
+{% set x.value = x.value + 1 %}
+</div>
+{% endfor %}
+{% endif %}
+</form>
+<br>
+<br>
+{% if isOwner %}
+<form action = "/main/polls/{{pollData[0]}}" method = "post">
+<button id = "endpoll" type = "submit" name = "endpoll"> End poll </button>
+</form>
+{% endif %}
+{% endblock %}

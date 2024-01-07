@@ -7,10 +7,11 @@ def valid_email(email):
     return bool (re.match(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", email))
 
 def duped_username(engine, username):
+    userN = username.lower()
     with engine.connect() as connection:
-        checkduplicates = connection.execute(text("SELECT username FROM users WHERE username = :username LIMIT 1"), {'username': username})
-    for row in checkduplicates:   
-        if (username == row.username):
+        checkduplicates = connection.execute(text("SELECT username FROM users WHERE LOWER(username) = :username LIMIT 1"), {'username': userN})
+    for row in checkduplicates:
+        if (userN == row.username.lower()):
             return True
     return False
 
@@ -33,16 +34,18 @@ def valid_password(password):
     return True
 
 def get_password(engine, username, password):
+    userN = username.lower()
     with engine.connect() as connection:
-        checkpass = connection.execute(text("SELECT password FROM users WHERE username = :username LIMIT 1"), {'username': username})
+        checkpass = connection.execute(text("SELECT password FROM users WHERE LOWER(username) = :username LIMIT 1"), {'username': userN})
     for row in checkpass:
         return (check_password_hash(row.password, password))
         
 def duped_pollId(engine, pollId):
+    ID = pollId.lower()
     with engine.connect() as connection:
-        checkduplicates = connection.execute(text("SELECT pollId FROM polls WHERE pollId = :pollId LIMIT 1"), {'pollId': pollId})
+        checkduplicates = connection.execute(text("SELECT pollId FROM polls WHERE LOWER(pollId) = :pollId LIMIT 1"), {'pollId': ID})
     for row in checkduplicates:   
-        if (pollId == row.pollId):
+        if (ID == row.pollId.lower()):
             return True
     return False
 
@@ -54,3 +57,12 @@ def optioncountarr(optioncount):
     
 def checkopts():
     return "placeholder"
+
+def getUsername(engine, username):
+    userN = username.lower()
+    with engine.connect() as connection:
+        checkduplicates = connection.execute(text("SELECT username FROM users WHERE LOWER(username) = :username LIMIT 1"), {'username': userN})
+        for row in checkduplicates:
+            returnString = "".join(row)
+        return returnString
+
