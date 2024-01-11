@@ -44,7 +44,7 @@
         Option {{n}}: <input id = "polloption{{n}}" name = "option{{n}}" required>
             <br>
             Provide justification/additional details for selecting option {{n}} to convince voters: <br>
-            <textarea id= "explain{{n}}" name = "explain{{n}}" rows = 10 cols = 30>
+            <textarea id= "explain{{n}}" name = "explain{{n}}" value = ">>" rows = 10 cols = 30>
             </textarea> 
             <br>
         {%endfor%}
@@ -69,10 +69,10 @@
         <p>
             Select if the poll is public or private:
         </p>
-        <input id= "pollPublic" type= "radio" name = "pollPublicity" value = "True" checked>
+        <input id= "pollPublic" type= "radio" name = "pollPublicity" value = 1 checked>
         <label for="pollPublic">Poll can be accessed through search or id</label>
         <br>
-        <input id= "pollPrivate" type= "radio" name = "pollPublicity" value = "False">
+        <input id= "pollPrivate" type= "radio" name = "pollPublicity" value = 0>
         <label for="pollPrivate">Poll can only be accessed through id</label>
         <br>
     </div>
@@ -81,10 +81,10 @@
         <p>
             Select if the poll result can be previewed while ongoing:
         </p>
-        <input id= "pollView" type= "radio" name = "pollView" value = "True" checked>
+        <input id= "pollView" type= "radio" name = "pollView" value = 1 checked>
         <label for="pollView">Poll can be viewed while ongoing</label>
         <br>
-        <input id= "pollNoView" type= "radio" name = "pollView" value = "False">
+        <input id= "pollNoView" type= "radio" name = "pollView" value = 0>
         <label for="pollNoView">Poll can only be viewed when result is released</label>
         <br>
     </div>

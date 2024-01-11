@@ -17,7 +17,8 @@ from voting import(
     checkvoted,
     optvoted,
     tallying,
-    addCounter
+    addCounter,
+    searchres
 )
 from secretkey import keysec
 from flask import Flask, redirect, render_template, request, flash, url_for
@@ -262,6 +263,14 @@ def makepoll():
             pollId = pollId.lower()
             timerSeconds = int(request.form.get("timerDay"))*86400+int(request.form.get("timerHours"))*3600+int(request.form.get("timerMinutes"))*60+int(request.form.get("timerSeconds"))
             manuality = False
+            if (request.form.get("pollView")) == 1:
+                canView = True
+            else:
+                canView = False
+            if (request.form.get("pollPublicity")) == 1:
+                isPublic = True
+            else:
+                isPublic = False
             if timerSeconds <= 0:
                 manuality = True
             if duped_pollId(engine, pollId):
@@ -283,8 +292,8 @@ def makepoll():
                     pollQuestion = request.form.get("pollQuestion"),
                     privacyMode = request.form.get("pollPrivacy"),
                     votingMode = request.form.get("voteSystem"),
-                    canViewWhileOngoing = bool(request.form.get("pollView")),
-                    publicity = bool(request.form.get("pollPublicity")),
+                    canViewWhileOngoing = canView,
+                    publicity = isPublic,
                     timeRemaining = timerSeconds,
                     pollManual = manuality,
                     currentWinner = pollOptions[0],
@@ -328,7 +337,8 @@ def searchpoll():
         return render_template("searchpoll.html")
     if request.method == "POST":
         if request.form.get("pollIdButton") is not None:
-            if request.form.get("searchPollId") == "":
+            if not duped_pollId(engine, request.form.get("searchPollId")):
+                flash("No such poll ID!")
                 return render_template("searchpoll.html")
             else:
                 result = request.form.get("searchPollId")
@@ -340,7 +350,26 @@ def searchpoll():
 @app.route("/main/polls", methods = ["GET", "POST"])
 def searchresults():
     if request.method == "GET":
-        return "1"
+        results = searchres(engine, "")
+        toDisplay = []
+        for i in results:
+            toDisplay.append(getpoll(engine, i))
+        return render_template("pollfind.html", toDisplay = toDisplay)
+    if request.method == "POST":
+        if request.form.get("searchPollName") is not None:
+            results = searchres(engine, request.form.get("searchbar"))
+            toDisplay = []
+            for i in results:
+                toDisplay.append(getpoll(engine, i))
+            return render_template("pollfind.html", toDisplay = toDisplay)
+        else:
+            numofPolls = int(request.form.get("numofDisplay"))
+            for i in range(numofPolls):
+                if request.form.get("".join(["visitPoll", str(i+1)])) is not None:
+                    pollId = request.form.get("".join(["visitPollId", str(i+1)]))
+                    return redirect(url_for("pollDisplay", pollId = pollId))
+
+
 
 @login_required
 @app.route("/main/polls/<pollId>", methods = ["GET", "POST"])
@@ -364,10 +393,10 @@ def pollDisplay(pollId):
                     if request.form.get("".join(["option", str(i+1)])) is not None:
                         if checkvoted(engine, current_user.id, pollId):
                             with engine.connect() as connection:
-                                connection.execute(text("DELETE FROM Votes WHERE pollid = :pollid AND Userid = :userid"), {'pollid': pollId, 'userid': current_user.id})
+                                connection.execute(text("DELETE FROM Votes WHERE (pollid = :pollid AND Userid = :userid)"), {'pollid': pollId, 'userid': current_user.id})
                                 connection.commit()
                         new = Votes(
-                            Counter = addCounter(),
+                            Counter = addCounter(engine),
                             Userid = current_user.id,
                             pollid = pollId,
                             voteoption = "".join(["option", str(i+1)])

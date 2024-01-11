@@ -15,14 +15,15 @@
     {% if pollData[6] == "popularity" %}
     {% for temp in range(pollData[12]|int) %}
     <div>
-    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}} | {{tallies[x.value-1]}} votes</p>
+    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}} | {{tallies[x.value-1]}} vote(s)</p>
     {% set n.value = n.value + 2 %}
     {% set x.value = x.value + 1 %}
     </div>
     {% endfor %}
     <p> Winner(s): <br>
     {% for temp in range(tallies|length - pollData[12]) %}
-    Option {{tallies[x.value-1]+1}} <br>
+    <p id = "winner1"> Option {{tallies[x.value-1]+1}} 
+    </p>
     {% set x.value = x.value + 1 %}
     {% endfor %}
     </p>
