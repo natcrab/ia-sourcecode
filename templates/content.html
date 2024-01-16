@@ -19,4 +19,9 @@
         {%endfor%}
     {%endwith%}
     {% block maincontent %}{% endblock %}
+    <form action = "/main" method = "post">
+        <div>
+            <button name = "Return" type = "submit"> Return </button>
+        </div>
+    </form>
 {% endblock %}

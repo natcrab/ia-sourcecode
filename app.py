@@ -1,6 +1,7 @@
 #importing various libraries and framework common to Flask
 import os
 import sqlite3
+import math
 from func import (
     valid_email,
     duped_username,
@@ -9,7 +10,6 @@ from func import (
     get_password,
     duped_pollId,
     getUsername,
-    checkopts,
     optioncountarr
 )
 from voting import(
@@ -18,7 +18,10 @@ from voting import(
     optvoted,
     tallying,
     addCounter,
-    searchres
+    searchres,
+    pollpassword,
+    whovoted,
+    pollpopularity
 )
 from secretkey import keysec
 from flask import Flask, redirect, render_template, request, flash, url_for
@@ -226,6 +229,8 @@ def contentpage():
         elif request.form.get("logout") is not None:
             logout_user()
             return redirect("/home")
+        elif request.form.get("Return") is not None:
+            return redirect("/main")
 
 @login_required    
 @app.route("/main/makepoll", methods = ["GET", "POST"])
@@ -263,11 +268,11 @@ def makepoll():
             pollId = pollId.lower()
             timerSeconds = int(request.form.get("timerDay"))*86400+int(request.form.get("timerHours"))*3600+int(request.form.get("timerMinutes"))*60+int(request.form.get("timerSeconds"))
             manuality = False
-            if (request.form.get("pollView")) == 1:
+            if (request.form.get("pollView")) == "1":
                 canView = True
             else:
                 canView = False
-            if (request.form.get("pollPublicity")) == 1:
+            if (request.form.get("pollPublicity")) == "1":
                 isPublic = True
             else:
                 isPublic = False
@@ -277,7 +282,7 @@ def makepoll():
                 flash("poll Id already used, please pick another one")
                 return render_template("makepoll.html", optioncount = optioncountarr(optioncount), numopt = optioncount, needPass = needPass)
             else:
-                if needPass == 0:
+                if needPass == 1:
                     needPassBool = True
                     password = str(request.form.get("pollPassword"))
                     password = generate_password_hash(password)
@@ -354,6 +359,11 @@ def searchresults():
         toDisplay = []
         for i in results:
             toDisplay.append(getpoll(engine, i))
+            n = len(toDisplay)
+            for i in range(math.floor(n/2)):
+                        temp = toDisplay[i]
+                        toDisplay[i] = toDisplay[n-1-i]
+                        toDisplay[n-1-i] = temp
         return render_template("pollfind.html", toDisplay = toDisplay)
     if request.method == "POST":
         if request.form.get("searchPollName") is not None:
@@ -361,7 +371,40 @@ def searchresults():
             toDisplay = []
             for i in results:
                 toDisplay.append(getpoll(engine, i))
-            return render_template("pollfind.html", toDisplay = toDisplay)
+            x = request.form.getlist("status")
+            try:
+                if "ongoing" not in x:   
+                    for i in range(len(toDisplay)):
+                        if toDisplay[i][15] == True:
+                            toDisplay[i] = "rm"
+                if "ended" not in x:   
+                    for i in range(len(toDisplay)):
+                        if toDisplay[i][15] == False:
+                            toDisplay[i] = "rm" 
+            except(IndexError):
+                pass
+            finally:  
+                while "rm" in toDisplay:
+                    toDisplay.remove("rm")     
+                sortmode = request.form.get("searchSort")
+                match sortmode:
+                    case "New":
+                        n = len(toDisplay)
+                        for i in range(math.floor(n/2)):
+                            temp = toDisplay[i]
+                            toDisplay[i] = toDisplay[n-1-i]
+                            toDisplay[n-1-i] = temp
+                    case "Popularity":
+                        length = len(toDisplay)
+                        for i in range(length):
+                            for k in range(0, length - i - 1, 1):
+                                if pollpopularity(engine, toDisplay[k][0]) < pollpopularity(engine, toDisplay[k+1][0]):
+                                    temp = toDisplay[k] 
+                                    toDisplay[k] = toDisplay[k+1]
+                                    toDisplay[k+1] = temp
+                    case _:
+                        pass                
+                return render_template("pollfind.html", toDisplay = toDisplay)
         else:
             numofPolls = int(request.form.get("numofDisplay"))
             for i in range(numofPolls):
@@ -375,14 +418,23 @@ def searchresults():
 @app.route("/main/polls/<pollId>", methods = ["GET", "POST"])
 def pollDisplay(pollId):
     pollData = getpoll(engine, pollId)
+    passEntered = False
     if current_user.username == pollData[1]:
         isOwner = True
+        passEntered = True
     else:
         isOwner = False
     if pollData[15]:
         if request.method == "GET":
-            return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner)
+            return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered = passEntered)
         if request.method == "POST":
+            if request.form.get("pollPassButton") is not None:
+                password = request.form.get("pollPass")
+                if pollpassword(engine, pollId, password):                   
+                    return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered= True)
+                else:
+                    flash("Wrong password, please try again")
+                    return redirect(url_for("pollDisplay", pollId = pollId))
             if request.form.get("endpoll") is not None:
                 with engine.connect() as connection:
                     connection.execute(text("UPDATE Polls Set ongoing = False WHERE pollid = :pollid"), {'pollid': pollId})
@@ -407,3 +459,20 @@ def pollDisplay(pollId):
     else:
         if request.method == "GET":
             return render_template("pollresults.html", pollData = pollData, tallies = tallying(engine, pollId))
+        if request.method == "POST":
+            if request.form.get("viewDetails") is not None:
+                return redirect(url_for("pollmore", pollId = pollId))
+        
+@login_required
+@app.route("/main/polls/<pollId>/more", methods = ["GET", "POST"])
+def pollmore(pollId):
+    if request.method == "GET":
+        privacy = (getpoll(engine, pollId))[5]
+        match privacy:
+            case "Hide":
+                mode = 1
+            case "ShowHalf":
+                mode = 2
+            case "Show":
+                mode = 3
+        return render_template("polldetails.html", mode = mode, pollId = pollId, info = whovoted(engine, pollId))

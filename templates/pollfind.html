@@ -2,8 +2,18 @@
 {% block maincontent %}
 <form action = "/main/polls" method = "post">
     <input id = "searchbar" name = "searchbar" type = "text" placeholder = "Search here...">
-    <button id = "searchPollName" name = "searchPollName" type = "submit">Search</button>
+    <label for = "searchSort">Sorting option</label>
+    <select name = "searchSort" id = "searchSort">
+        <option value = "New"> Creation date (newest) </option>
+        <option value = "Old"> Creation date (oldest) </option>
+        <option value = "Popularity"> Most participant </option>
+    </select>
 
+    <input type = "checkbox" name = "status" value = "ongoing" id = "ongoing" checked>
+    <label for = "ongoing"> Ongoing polls </label>
+    <input type = "checkbox" name = "status" value = "ended" id = "ended" checked>
+    <label for = "ended"> Ended polls </label>
+    <button id = "searchPollName" name = "searchPollName" type = "submit">Search</button>
 <br>
 <br>
 {% if toDisplay|length > 0 %}

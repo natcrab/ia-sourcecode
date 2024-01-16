@@ -1,0 +1,21 @@
+{% extends "content.html" %}
+{% block maincontent %}
+<div id = "topmore">
+Id: {{pollId}} <br>
+</div>
+<p>
+Made at (insert time here) <br>
+Ongoing for (insert time here)<br>
+</p>
+{% if mode >= 2 %}
+<p>
+Voters:
+{% for i in range(info|length) %} 
+{{info[i][1]}} 
+{% if mode >= 3 %}
+: {{info[i][3]}}
+{% endif %}
+{% endfor %}
+</p>
+{% endif %}
+{% endblock %}

@@ -55,8 +55,6 @@ def optioncountarr(optioncount):
         optioncountarray.append(i+1)
     return optioncountarray
     
-def checkopts():
-    return "placeholder"
 
 def getUsername(engine, username):
     userN = username.lower()
@@ -65,4 +63,9 @@ def getUsername(engine, username):
         for row in checkduplicates:
             returnString = "".join(row)
         return returnString
+
+
+    
+    
+
 

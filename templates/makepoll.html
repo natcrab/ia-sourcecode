@@ -18,7 +18,7 @@
     {% if needPass == 1 %}
     <div>
         <p>
-            Poll password (a unique code that is required to vote on your poll, can be changed later): <br>
+            Poll password (a password that is required to vote on your poll, can be changed later): <br>
         </p>
         <input id= "pollPassword" type= "text" name = "pollPassword" placeholder = "Password:" required>
     </div>
@@ -69,10 +69,10 @@
         <p>
             Select if the poll is public or private:
         </p>
-        <input id= "pollPublic" type= "radio" name = "pollPublicity" value = 1 checked>
+        <input id= "pollPublic" type= "radio" name = "pollPublicity" value = "1" checked>
         <label for="pollPublic">Poll can be accessed through search or id</label>
         <br>
-        <input id= "pollPrivate" type= "radio" name = "pollPublicity" value = 0>
+        <input id= "pollPrivate" type= "radio" name = "pollPublicity" value = "0">
         <label for="pollPrivate">Poll can only be accessed through id</label>
         <br>
     </div>
@@ -81,10 +81,10 @@
         <p>
             Select if the poll result can be previewed while ongoing:
         </p>
-        <input id= "pollView" type= "radio" name = "pollView" value = 1 checked>
+        <input id= "pollView" type= "radio" name = "pollView" value = "1" checked>
         <label for="pollView">Poll can be viewed while ongoing</label>
         <br>
-        <input id= "pollNoView" type= "radio" name = "pollView" value = 0>
+        <input id= "pollNoView" type= "radio" name = "pollView" value = "0">
         <label for="pollNoView">Poll can only be viewed when result is released</label>
         <br>
     </div>

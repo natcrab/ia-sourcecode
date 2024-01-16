@@ -28,4 +28,7 @@
     {% endfor %}
     </p>
     {% endif %}
+    <form action = "/main/polls/{{pollData[0]}}" method = "post">
+    <button id = "viewDetails" name = "viewDetails" type = "submit"> View details </button>
+    </form>
 {% endblock %}
