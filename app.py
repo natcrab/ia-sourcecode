@@ -24,6 +24,7 @@ from voting import(
     pollpopularity
 )
 from secretkey import keysec
+from datetime import datetime, timedelta
 from flask import Flask, redirect, render_template, request, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, text
@@ -80,9 +81,8 @@ class Polls(db.Model):
     pollQuestion = db.Column(db.String) #index 4
     privacyMode = db.Column(db.String)
     votingMode = db.Column(db.String)
-    canViewWhileOngoing = db.Column(db.Boolean)
     publicity = db.Column(db.Boolean)
-    timeRemaining = db.Column(db.Integer) #index 9
+    pollTime = db.Column(db.Integer) #index 9
     pollManual = db.Column(db.Boolean)
     currentWinner = db.Column(db.String)
     NumofOptions = db.Column(db.Integer)
@@ -268,10 +268,6 @@ def makepoll():
             pollId = pollId.lower()
             timerSeconds = int(request.form.get("timerDay"))*86400+int(request.form.get("timerHours"))*3600+int(request.form.get("timerMinutes"))*60+int(request.form.get("timerSeconds"))
             manuality = False
-            if (request.form.get("pollView")) == "1":
-                canView = True
-            else:
-                canView = False
             if (request.form.get("pollPublicity")) == "1":
                 isPublic = True
             else:
@@ -297,9 +293,8 @@ def makepoll():
                     pollQuestion = request.form.get("pollQuestion"),
                     privacyMode = request.form.get("pollPrivacy"),
                     votingMode = request.form.get("voteSystem"),
-                    canViewWhileOngoing = canView,
                     publicity = isPublic,
-                    timeRemaining = timerSeconds,
+                    pollTime = datetime.now() + timerSeconds,
                     pollManual = manuality,
                     currentWinner = pollOptions[0],
                     NumofOptions = optioncount,
