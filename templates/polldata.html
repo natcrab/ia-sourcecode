@@ -1,11 +1,16 @@
 {% extends "content.html" %}
 {% block maincontent %}
-{% if pollData[13] and not passEntered %}
+{% if pollData[13] == true and passEntered == false %}
 <form action = "/main/polls/{{pollData[0]}}" method = "post">
 Enter password here to view the poll:
 <input type = "text" name = "pollPass" id = "pollPass">
 <button type = "submit" name = "pollPassButton" id = "pollPassButton">Submit</button>
 {% else %}
+{% if pollData[10] == true %}
+<h3> Poll ends when the maker chooses to end it </h3>
+{% else %}
+<h3> Time Remaining: {{Remains}} </h3>
+{% endif %}
 <h3 id = "displayTop"> ID: {{pollData[0]}} <br>
 Maker: {{pollData[1]}} <br>
 </h3>

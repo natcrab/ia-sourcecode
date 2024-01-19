@@ -21,10 +21,12 @@ from voting import(
     searchres,
     pollpassword,
     whovoted,
-    pollpopularity
+    pollpopularity,
+    gettime
 )
 from secretkey import keysec
 from datetime import datetime, timedelta
+from time import strftime
 from flask import Flask, redirect, render_template, request, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, text
@@ -81,8 +83,9 @@ class Polls(db.Model):
     pollQuestion = db.Column(db.String) #index 4
     privacyMode = db.Column(db.String)
     votingMode = db.Column(db.String)
+    pollStart = db.Column(db.DateTime)
     publicity = db.Column(db.Boolean)
-    pollTime = db.Column(db.Integer) #index 9
+    pollTime = db.Column(db.DateTime) #index 9
     pollManual = db.Column(db.Boolean)
     currentWinner = db.Column(db.String)
     NumofOptions = db.Column(db.Integer)
@@ -267,13 +270,17 @@ def makepoll():
             pollId = str(request.form.get("pollId"))
             pollId = pollId.lower()
             timerSeconds = int(request.form.get("timerDay"))*86400+int(request.form.get("timerHours"))*3600+int(request.form.get("timerMinutes"))*60+int(request.form.get("timerSeconds"))
-            manuality = False
+            print(timerSeconds)
             if (request.form.get("pollPublicity")) == "1":
                 isPublic = True
             else:
                 isPublic = False
-            if timerSeconds <= 0:
+            if timerSeconds > 0:
+                manuality = False
+                pollTime = datetime.utcnow() + timedelta(seconds = timerSeconds)
+            else:
                 manuality = True
+                pollTime = datetime.utcnow()
             if duped_pollId(engine, pollId):
                 flash("poll Id already used, please pick another one")
                 return render_template("makepoll.html", optioncount = optioncountarr(optioncount), numopt = optioncount, needPass = needPass)
@@ -294,7 +301,8 @@ def makepoll():
                     privacyMode = request.form.get("pollPrivacy"),
                     votingMode = request.form.get("voteSystem"),
                     publicity = isPublic,
-                    pollTime = datetime.now() + timerSeconds,
+                    pollStart = datetime.utcnow(),
+                    pollTime = pollTime,
                     pollManual = manuality,
                     currentWinner = pollOptions[0],
                     NumofOptions = optioncount,
@@ -377,7 +385,7 @@ def searchresults():
                         if toDisplay[i][15] == False:
                             toDisplay[i] = "rm" 
             except(IndexError):
-                pass
+                return redirect("/main/polls")
             finally:  
                 while "rm" in toDisplay:
                     toDisplay.remove("rm")     
@@ -419,20 +427,29 @@ def pollDisplay(pollId):
         passEntered = True
     else:
         isOwner = False
+    remains = datetime.strptime(gettime(engine, pollId), '%Y-%m-%d %H:%M:%S.%f') - datetime.utcnow()
+    if (not pollData[10]) and pollData[15]:
+        if remains.total_seconds() < 0.0:
+            print("AAAA")
+            with engine.connect() as connection:
+                connection.execute(text("UPDATE Polls Set ongoing = False WHERE pollid = :pollid"), {'pollid': pollId})
+                connection.commit()
+            pollData[15] = False
     if pollData[15]:
         if request.method == "GET":
-            return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered = passEntered)
+                return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered = passEntered, Remains = str(remains)[:-7])           
         if request.method == "POST":
             if request.form.get("pollPassButton") is not None:
                 password = request.form.get("pollPass")
                 if pollpassword(engine, pollId, password):                   
-                    return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered= True)
+                    return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered= True, Remains = str(remains)[:-7])
                 else:
                     flash("Wrong password, please try again")
                     return redirect(url_for("pollDisplay", pollId = pollId))
             if request.form.get("endpoll") is not None:
                 with engine.connect() as connection:
                     connection.execute(text("UPDATE Polls Set ongoing = False WHERE pollid = :pollid"), {'pollid': pollId})
+                    connection.execute(text("UPDATE Polls Set pollTime = :datetime WHERE pollid = :pollid"), {'pollid': pollId, 'datetime': datetime.utcnow()})
                     connection.commit()
                 redirect(url_for("pollDisplay", pollId = pollId))
             if pollData[6] == "popularity":
@@ -450,6 +467,7 @@ def pollDisplay(pollId):
                         )
                         db.session.add(new)
                         db.session.commit()
+                flash("Your vote has been submitted")
                 return redirect(url_for("pollDisplay", pollId = pollId))
     else:
         if request.method == "GET":
@@ -470,4 +488,11 @@ def pollmore(pollId):
                 mode = 2
             case "Show":
                 mode = 3
-        return render_template("polldetails.html", mode = mode, pollId = pollId, info = whovoted(engine, pollId))
+        time = engine.connect().execute(text("SELECT pollStart from Polls where pollid = :pollid"), {'pollid': pollId}).fetchone()
+        start = datetime.strptime(time.pollStart, '%Y-%m-%d %H:%M:%S.%f')
+        ended = datetime.strptime(gettime(engine, pollId), '%Y-%m-%d %H:%M:%S.%f')
+        ongoing  =  ended - start
+        return render_template("polldetails.html", mode = mode, pollId = pollId, info = whovoted(engine, pollId), start = str(start)[:-7], ended = ended, ongoing = str(ongoing)[:-7])
+    if request.method == "POST":
+        if request.form.get("back") is not None:
+            return redirect(url_for("pollDisplay", pollId = pollId))

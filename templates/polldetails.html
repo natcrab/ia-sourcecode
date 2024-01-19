@@ -4,8 +4,9 @@
 Id: {{pollId}} <br>
 </div>
 <p>
-Made at (insert time here) <br>
-Ongoing for (insert time here)<br>
+Made at {{start}} <br>
+Ended at {{ended}}
+(Ongoing for {{ongoing}})<br>
 </p>
 {% if mode >= 2 %}
 <p>
@@ -18,4 +19,7 @@ Voters:
 {% endfor %}
 </p>
 {% endif %}
+<form action = "/main/polls/{{pollId}}/more" method = "post">
+    <button name = "back" type = "submit">Go back to poll</button>
+</form>
 {% endblock %}

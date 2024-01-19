@@ -79,3 +79,9 @@ def pollpopularity(engine, pollid):
     with engine.connect() as connection:
         num = connection.execute(text("SELECT COUNT (*) From Votes WHERE pollid = :pollid"), {'pollid': pollid}).fetchone()
     return num
+
+def gettime(engine, pollid):
+    with engine.connect() as connection:
+        time = connection.execute(text("SELECT pollTime from Polls where pollid = :pollid"), {'pollid': pollid}).fetchone()
+        end = time.pollTime
+    return end
