@@ -8,9 +8,13 @@ def getpoll(engine, pollId):
         details = list(getDetails)
         return details
     
-def checkvoted(engine, userid, pollid):
+
+def checkvoted(engine, userid, pollid, polltype):
     with engine.connect() as connection:
-        checkduplicates = connection.execute(text("SELECT Userid FROM Votes WHERE pollid = :pollid"), {'pollid': pollid})
+        if polltype == "score" or polltype == "popularity":
+            checkduplicates = connection.execute(text("SELECT Userid FROM Votes WHERE pollid = :pollid"), {'pollid': pollid})
+        elif polltype == "tideman":
+            checkduplicates = connection.execute(text("SELECT Userid FROM Tideman WHERE pollid = :pollid"), {'pollid': pollid})
     for row in checkduplicates:
         if (userid == row.Userid):
             return 1
@@ -25,43 +29,72 @@ def optvoted(engine, userid, pollid):
         else:
             return "option-1"
     
-def tallying(engine, pollid):
-    with engine.connect() as connection:
-        results = []
-        optCount = connection.execute(text("SELECT NumofOptions FROM Polls WHERE pollId = :pollid LIMIT 1"), {'pollid': pollid}).fetchone()
-        optCount = (list(optCount))[0]
-        for i in range(optCount):
-            option = "".join(["option", str(i+1)])
-            temp = connection.execute(text("SELECT COUNT (*) From Votes WHERE (voteoption = :option AND pollid = :pollid)"), {'option': option, 'pollid': pollid}).fetchone()
-            results.append((list(temp))[0])
-    x = len(results)
-    for i in range(x):
-        if results[i] == max(results[0:optCount-1]):
-            results.append(i)
-    return results
-
-def whovoted(engine, pollid):
-    results = []
-    with engine.connect() as connection:
-        people = connection.execute(text("SELECT * from Votes WHERE pollid = :pollid"), {'pollid': pollid})
-        x = 0
-        for row in people:
-            results.append(list(row))
-            username = connection.execute(text("SELECT username from Users WHERE id = :id"), {'id': row.Userid}).fetchone()
-            results[x][1] = (list(username))[0]
-            x+=1
+def tallying(engine, pollid, polltype):
+    if polltype == "tideman":
+        return ["option1", "option2"]
+    else:
+        with engine.connect() as connection:
+            results = []
+            optCount = connection.execute(text("SELECT NumofOptions FROM Polls WHERE pollId = :pollid LIMIT 1"), {'pollid': pollid}).fetchone()
+            optCount = (list(optCount))[0]
+            for i in range(optCount):
+                option = "".join(["option", str(i+1)])
+                if polltype == "popularity":
+                    temp = connection.execute(text("SELECT COUNT (*) From Votes WHERE (voteoption = :option AND pollid = :pollid)"), {'option': option, 'pollid': pollid}).fetchone()
+                elif polltype == "score":
+                    temp = connection.execute(text("SELECT SUM(score) From Votes WHERE (voteoption = :option AND pollid = :pollid)"), {'option': option, 'pollid': pollid}).fetchone()                   
+                results.append((list(temp))[0])
+        x = len(results)
+        print(x)
+        for i in range(x):
+            if results[i] == max(results[0:x]):
+                results.append(i)
         return results
 
-def addCounter(engine):
+def whovoted(engine, pollid, polltype):
+    if polltype == "tideman":
+        results = []
+        x = 0
+        with engine.connect() as connection:
+            people = connection.execute(text("SELECT * from Tideman WHERE pollid = :pollid"), {'pollid': pollid})
+            for row in people:
+                results.append(list(row))
+                username = connection.execute(text("SELECT username from Users WHERE id = :id"), {'id': row.Userid}).fetchone()
+                results[x][1] = (list(username))[0]
+                x+=1
+            return results
+    else:
+        results = []
+        with engine.connect() as connection:
+            people = connection.execute(text("SELECT * from Votes WHERE pollid = :pollid"), {'pollid': pollid})
+            x = 0
+            for row in people:
+                results.append(list(row))
+                username = connection.execute(text("SELECT username from Users WHERE id = :id"), {'id': row.Userid}).fetchone()
+                results[x][1] = (list(username))[0]
+                x+=1
+            if polltype == "popularity":                 
+                return results
+            elif polltype == "score":
+                arr = []
+                for i in range(len(results)):
+                    if results[i][1] not in arr:
+                        arr.append(results[i][1])
+                return arr
+            
+
+def addCounter(engine, polltype):
     with engine.connect() as connection:
-        Counter = connection.execute(text("SELECT MAX (Counter) FROM Votes")).fetchone()
+        if (polltype == "Votes"):
+            Counter = connection.execute(text("SELECT MAX (Counter) FROM Votes")).fetchone()
+        elif (polltype == "Tideman"):
+            Counter = connection.execute(text("SELECT MAX (Counter) FROM Tideman")).fetchone()
     if (list(Counter))[0] is not None:
         return int((list(Counter))[0])+ 1
     else:
         return 1
     
 def searchres(engine, keyword):   
-    keyW = keyword.lower()
     result = []
     with engine.connect() as connection:
         getDetails = connection.execute(text("SELECT pollId FROM polls WHERE (LOWER(pollname) LIKE :keyword OR LOWER(pollDescription) LIKE :keyword OR LOWER(pollQuestion) LIKE :keyword)"), {'keyword': "%" + keyword + "%"})

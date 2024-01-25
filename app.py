@@ -112,6 +112,8 @@ class Polls(db.Model):
     option9exp = db.Column(db.String)
     option10 = db.Column(db.String)
     option10exp = db.Column(db.String)
+    minscore = db.Column(db.Integer) #index 36
+    maxscore = db.Column(db.Integer)
 
 
 class Votes(db.Model):
@@ -119,7 +121,22 @@ class Votes(db.Model):
     Userid = db.Column(db.Integer)
     pollid = db.Column(db.String)
     voteoption = db.Column(db.String)
+    score = db.Column(db.Integer)
     
+class Tideman(db.Model):
+    Counter = db.Column(db.Integer, primary_key = True, unique = True)
+    Userid = db.Column(db.Integer)
+    pollid = db.Column(db.String)
+    rank1 = db.Column(db.String)  #index 4
+    rank2 = db.Column(db.String)
+    rank3 = db.Column(db.String)
+    rank4 = db.Column(db.String)
+    rank5 = db.Column(db.String)
+    rank6 = db.Column(db.String)
+    rank7 = db.Column(db.String)
+    rank8 = db.Column(db.String)
+    rank9 = db.Column(db.String)
+    rank10 = db.Column(db.String)
 
 @manage.user_loader
 def load(userid):
@@ -268,23 +285,22 @@ def makepoll():
                 pollOptions.append("")
                 pollExplains.append("")
             pollId = str(request.form.get("pollId"))
-            pollId = pollId.lower()
-            timerSeconds = int(request.form.get("timerDay"))*86400+int(request.form.get("timerHours"))*3600+int(request.form.get("timerMinutes"))*60+int(request.form.get("timerSeconds"))
-            print(timerSeconds)
-            if (request.form.get("pollPublicity")) == "1":
-                isPublic = True
-            else:
-                isPublic = False
-            if timerSeconds > 0:
-                manuality = False
-                pollTime = datetime.utcnow() + timedelta(seconds = timerSeconds)
-            else:
-                manuality = True
-                pollTime = datetime.utcnow()
+            pollId = pollId.lower()      
             if duped_pollId(engine, pollId):
                 flash("poll Id already used, please pick another one")
                 return render_template("makepoll.html", optioncount = optioncountarr(optioncount), numopt = optioncount, needPass = needPass)
             else:
+                timerSeconds = int(request.form.get("timerDay"))*86400+int(request.form.get("timerHours"))*3600+int(request.form.get("timerMinutes"))*60+int(request.form.get("timerSeconds"))     
+                if (request.form.get("pollPublicity")) == "1":
+                    isPublic = True
+                else:
+                    isPublic = False
+                if timerSeconds > 0:
+                    manuality = False
+                    pollTime = datetime.utcnow() + timedelta(seconds = timerSeconds)
+                else:
+                    manuality = True
+                    pollTime = datetime.utcnow()
                 if needPass == 1:
                     needPassBool = True
                     password = str(request.form.get("pollPassword"))
@@ -292,6 +308,10 @@ def makepoll():
                 else:
                     needPassBool = False
                     password = ""
+                minscore = request.form.get("minscore")
+                maxscore = request.form.get("maxscore")
+                if maxscore <= minscore:
+                    minscore = 0
                 new = Polls(
                     pollId = pollId,
                     creator = current_user.username,
@@ -328,16 +348,15 @@ def makepoll():
                     option9 = pollOptions[8], 
                     option9exp = pollExplains[8],
                     option10 = pollOptions[9], 
-                    option10exp = pollExplains[9]
+                    option10exp = pollExplains[9],
+                    minscore = minscore,
+                    maxscore = maxscore,
                 )
                 db.session.add(new)
                 db.session.commit()
                 flash("Poll added to database!")
                 return redirect("/main")
             
-
-
-
 @login_required
 @app.route("/main/searchpoll/", methods = ["GET", "POST"])  
 def searchpoll():
@@ -437,12 +456,12 @@ def pollDisplay(pollId):
             pollData[15] = False
     if pollData[15]:
         if request.method == "GET":
-                return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered = passEntered, Remains = str(remains)[:-7])           
+            return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId, pollData[6]), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered = passEntered, Remains = str(remains)[:-7])           
         if request.method == "POST":
             if request.form.get("pollPassButton") is not None:
                 password = request.form.get("pollPass")
                 if pollpassword(engine, pollId, password):                   
-                    return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered= True, Remains = str(remains)[:-7])
+                    return render_template("polldata.html", pollData = pollData, voted = checkvoted(engine, current_user.id, pollId, pollData[6]), optvoted = "".join(list(optvoted(engine, current_user.id, pollId))[6:]), isOwner = isOwner, passEntered= True, Remains = str(remains)[:-7])
                 else:
                     flash("Wrong password, please try again")
                     return redirect(url_for("pollDisplay", pollId = pollId))
@@ -455,23 +474,78 @@ def pollDisplay(pollId):
             if pollData[6] == "popularity":
                 for i in range(pollData[12]):
                     if request.form.get("".join(["option", str(i+1)])) is not None:
-                        if checkvoted(engine, current_user.id, pollId):
+                        if checkvoted(engine, current_user.id, pollId, "popularity"):
                             with engine.connect() as connection:
                                 connection.execute(text("DELETE FROM Votes WHERE (pollid = :pollid AND Userid = :userid)"), {'pollid': pollId, 'userid': current_user.id})
                                 connection.commit()
                         new = Votes(
-                            Counter = addCounter(engine),
+                            Counter = addCounter(engine, "Votes"),
                             Userid = current_user.id,
                             pollid = pollId,
-                            voteoption = "".join(["option", str(i+1)])
+                            voteoption = "".join(["option", str(i+1)]),
+                            score = 0
                         )
                         db.session.add(new)
                         db.session.commit()
-                flash("Your vote has been submitted")
-                return redirect(url_for("pollDisplay", pollId = pollId))
+            elif pollData[6] == "score":
+                if request.form.get("submitScore") is not None:
+                    if checkvoted(engine, current_user.id, pollId, "score"):
+                        with engine.connect() as connection:
+                            connection.execute(text("DELETE FROM Votes WHERE (pollid = :pollid AND Userid = :userid)"), {'pollid': pollId, 'userid': current_user.id})
+                            connection.commit()
+                    for i in range(pollData[12]):
+                        new = Votes(
+                            Counter = addCounter(engine, "Votes"),
+                            Userid = current_user.id,
+                            pollid = pollId,
+                            voteoption = "".join(["option", str(i+1)]),
+                            score = request.form.get("".join(["score", str(i+1)]))
+                        )
+                        db.session.add(new)
+                        db.session.commit()
+            elif pollData[6] == "tideman":
+                if request.form.get("submitTideman") is not None:
+                    if checkvoted(engine, current_user.id, pollId, "tideman"):
+                        with engine.connect() as connection:
+                            connection.execute(text("DELETE FROM Tideman WHERE (pollid = :pollid AND Userid = :userid)"), {'pollid': pollId, 'userid': current_user.id})
+                            connection.commit() 
+                    rank = [] 
+                    result = []   
+                    for i in range(pollData[12]):
+                        temp = int(request.form.get("".join(["tideman", str(i+1)])))
+                        if temp in rank:
+                            flash("Each option must have a unique ranking")
+                            return redirect(url_for("pollDisplay", pollId = pollId))
+                        rank.append(temp)                   
+                    for i in range(pollData[12]):
+                        result.append(rank.index(i+1)+1)
+                    while(len(result)< 10):
+                        result.append(0)
+                    new = Tideman(
+                        Counter = addCounter(engine, "Tideman"),
+                        Userid = current_user.id,
+                        pollid = pollId,
+                        rank1 = "".join(["option", str(result[0])]),
+                        rank2 = "".join(["option", str(result[1])]),
+                        rank3 = "".join(["option", str(result[2])]),
+                        rank4 = "".join(["option", str(result[3])]),
+                        rank5 = "".join(["option", str(result[4])]),
+                        rank6 = "".join(["option", str(result[5])]),
+                        rank7 = "".join(["option", str(result[6])]),
+                        rank8 = "".join(["option", str(result[7])]),
+                        rank9 = "".join(["option", str(result[8])]),
+                        rank10 = "".join(["option", str(result[9])]),
+                    )
+                    db.session.add(new)
+                    db.session.commit()                 
+            else: 
+                flash("Oops! It seems something went wrong with the poll!")
+                return redirect("/main/searchpoll")
+            flash("Your vote has been submitted")
+            return redirect(url_for("pollDisplay", pollId = pollId))
     else:
         if request.method == "GET":
-            return render_template("pollresults.html", pollData = pollData, tallies = tallying(engine, pollId))
+            return render_template("pollresults.html", pollData = pollData, tallies = tallying(engine, pollId, pollData[6]))
         if request.method == "POST":
             if request.form.get("viewDetails") is not None:
                 return redirect(url_for("pollmore", pollId = pollId))
@@ -479,6 +553,9 @@ def pollDisplay(pollId):
 @login_required
 @app.route("/main/polls/<pollId>/more", methods = ["GET", "POST"])
 def pollmore(pollId):
+    connect = engine.connect().execute(text("SELECT * FROM Polls WHERE pollid = :pollid"), {'pollid': pollId}).fetchone()
+    votetype = connect.votingMode
+    num = connect.NumofOptions
     if request.method == "GET":
         privacy = (getpoll(engine, pollId))[5]
         match privacy:
@@ -492,7 +569,21 @@ def pollmore(pollId):
         start = datetime.strptime(time.pollStart, '%Y-%m-%d %H:%M:%S.%f')
         ended = datetime.strptime(gettime(engine, pollId), '%Y-%m-%d %H:%M:%S.%f')
         ongoing  =  ended - start
-        return render_template("polldetails.html", mode = mode, pollId = pollId, info = whovoted(engine, pollId), start = str(start)[:-7], ended = ended, ongoing = str(ongoing)[:-7])
+        info =  whovoted(engine, pollId, votetype)
+        placeholder = []
+        scores = []
+        if votetype == "score":
+            for i in info:
+                username = engine.connect().execute(text("SELECT id from Users WHERE username = :username"), {'username': i}).fetchone()
+                placeholder.append(username.id)
+            for i in placeholder:
+                temp = engine.connect().execute(text("SELECT score from Votes WHERE pollid = :pollid AND Userid = :Userid"), {'pollid': pollId, 'Userid': i})
+                pholder = []
+                for row in temp:  
+                    pholder.append(row.score)
+                scores.append(pholder)
+            print(scores)
+        return render_template("polldetails.html", mode = mode, pollId = pollId, info = info, start = str(start)[:-7], ended = str(ended)[:-7], ongoing = str(ongoing)[:-7], votetype = votetype, scores = scores, num = num)
     if request.method == "POST":
         if request.form.get("back") is not None:
             return redirect(url_for("pollDisplay", pollId = pollId))

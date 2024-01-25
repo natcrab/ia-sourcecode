@@ -81,11 +81,19 @@
             Select which voting system to be used on the poll:
         </p>
         <input id= "Popularity" type= "radio" name = "voteSystem" value = "popularity" checked>
-        <label for="Popularity">Popularity</label>
+        <label for="Popularity">Popularity (most vote wins) </label>
         <br>
-        <input id= "Tideman" type= "radio" name = "voteSystem" value = "tideman">
-        <label for="Tideman">Tideman</label>
+        <input id= "Tideman" type= "radio" name = "voteSystem" value = "tideman" target = >
+        <label for="Tideman">Tideman <a href ="https://en.wikipedia.org/wiki/Ranked_pairs" target = "_blank">Read about the system here</a><br>
+        (Inspired by CS50x)
+        </label>
         <br>
+        <input id= "Score" type= "radio" name = "voteSystem" value = "score">
+        <label for="Score">Score <a href ="https://en.wikipedia.org/wiki/Score_voting" target = "_blank">Read about the system here</a></label>
+        Min score: <input id = "minscore" name = "minscore" type = "number" min = 0 max = 100 step = 1 value = 0>
+        Max score: <input id = "maxscore" name = "maxscore" type = "number" min = 1 max = 100 step = 1 value = 1>
+        <br>
+        (if your min score is higher or equal to max score, it would be automatically set to 0)
     </div>
     
     <div>

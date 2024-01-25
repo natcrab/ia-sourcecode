@@ -39,6 +39,7 @@ Maker: {{pollData[1]}} <br>
 {% set n = namespace(value = 16) %}
 {% set x = namespace(value = 1) %}
 {% if pollData[6] == "popularity" %}
+Voting system: Popularity (most votes wins) <br>
 {% for temp in range(pollData[12]|int) %}
 <div>
 <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
@@ -57,6 +58,34 @@ Justification: {{pollData[n.value+1]}}
 {% set x.value = x.value + 1 %}
 </div>
 {% endfor %}
+
+{% elif pollData[6] == "score" %}
+Voting system: Score <a href ="https://en.wikipedia.org/wiki/Score_voting" target = "_blank">Read about the system here</a> <br>
+{% for temp in range(pollData[12]|int) %}
+<p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
+<input id = "score{{x.value}}" type = "number" name = "score{{x.value}}"
+ min = {{pollData[36]}} max = {{pollData[37]}} step = 1 value = {{pollData[36]}}> </p>
+Justification: {{pollData[n.value+1]}}
+{% set n.value = n.value + 2 %}
+{% set x.value = x.value + 1 %}
+{% endfor %}
+<button id = "submitScore" type = "submit" name = "submitScore">Submit scores</button>
+
+{% elif pollData[6] == "tideman" %}
+Voting system: Tideman <a href ="https://en.wikipedia.org/wiki/Ranked_pairs" target = "_blank">Read about the system here</a> <br>
+Rank the options from best to worst (1 for best, {{pollData[12]}} for worst)
+Each option must receive a unique ranking
+{% for temp in range(pollData[12]|int) %}
+<p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
+<input id = "tideman{{x.value}}" type = "number" name = "tideman{{x.value}}"
+min = 1 max =  {{pollData[12]|int}} step = 1 value = {{x.value}}> </p>
+Justification: {{pollData[n.value+1]}}
+{% set n.value = n.value + 2 %}
+{% set x.value = x.value + 1 %}
+{% endfor %}
+<br>
+<button id = "submitTideman" type = "submit" name = "submitTideman">Submit scores</button>
+
 {% endif %}
 </form>
 <br>

@@ -13,6 +13,7 @@
     {% set n = namespace(value = 16) %}
     {% set x = namespace(value = 1) %}
     {% if pollData[6] == "popularity" %}
+
     {% for temp in range(pollData[12]|int) %}
     <div>
     <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}} | {{tallies[x.value-1]}} vote(s)</p>
@@ -22,11 +23,46 @@
     {% endfor %}
     <p> Winner(s): <br>
     {% for temp in range(tallies|length - pollData[12]) %}
-    <p id = "winner1"> Option {{tallies[x.value-1]+1}} 
+    <p id = "winners"> Option {{tallies[x.value-1]+1}} 
     </p>
     {% set x.value = x.value + 1 %}
     {% endfor %}
     </p>
+
+    {% elif pollData[6] == "score" %}
+
+    {% for temp in range(pollData[12]|int) %}
+    <div>
+    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}} | score: {{tallies[x.value-1]}} </p>
+    {% set n.value = n.value + 2 %}
+    {% set x.value = x.value + 1 %}
+    </div>
+    {% endfor %}
+    <p> Winner(s): <br>
+    {% for temp in range(tallies|length - pollData[12]) %}
+    <p id = "winners"> Option {{tallies[x.value-1]+1}} 
+    </p>
+    {% set x.value = x.value + 1 %}
+    {% endfor %}
+    </p>
+
+    {% elif pollData[6] == "tideman" %}
+    {% for temp in range(pollData[12]|int) %}
+    <div>
+    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}</p>
+    {% set n.value = n.value + 2 %}
+    {% set x.value = x.value + 1 %}
+    </div>
+    {% endfor %}
+    {% set x.value = 0 %}
+    <p> Winner(s): <br>
+    {% for temp in range(tallies|length) %}
+    <p id = "winners"> Option {{tallies[x.value]}}
+    </p>
+    {% set x.value = x.value + 1 %}
+    {% endfor %}
+    </p>
+
     {% endif %}
     <form action = "/main/polls/{{pollData[0]}}" method = "post">
     <button id = "viewDetails" name = "viewDetails" type = "submit"> View details </button>
