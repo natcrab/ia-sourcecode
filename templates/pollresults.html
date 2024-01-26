@@ -57,7 +57,7 @@
     {% set x.value = 0 %}
     <p> Winner(s): <br>
     {% for temp in range(tallies|length) %}
-    <p id = "winners"> Option {{tallies[x.value]}}
+    <p id = "winners"> {{tallies[x.value]}}
     </p>
     {% set x.value = x.value + 1 %}
     {% endfor %}

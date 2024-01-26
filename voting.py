@@ -1,5 +1,6 @@
 from sqlalchemy import text
 from werkzeug.security import check_password_hash
+from tideman import tideman
 
 def getpoll(engine, pollId):   
     ID = pollId.lower()
@@ -31,7 +32,23 @@ def optvoted(engine, userid, pollid):
     
 def tallying(engine, pollid, polltype):
     if polltype == "tideman":
-        return ["option1", "option2"]
+        votes = []
+        options = []
+        pollinfo = getpoll(engine, pollid)
+        n = 0
+        for i in range(16, 36, 2):
+            if (n < pollinfo[12]):
+                options.append(pollinfo[i])
+                n+=1
+            else:
+                break
+        temp = engine.connect().execute(text("SELECT * from Tideman WHERE pollid = :pollid"), {'pollid': pollid})
+        for row in temp:
+            votes.append(list(row))
+        arr = tideman(options, votes)
+        for i in range(len(arr)):
+            arr[i] = "".join(["option ", str(arr[i])])
+        return arr       
     else:
         with engine.connect() as connection:
             results = []
