@@ -14,17 +14,19 @@ Voting system: {{votetype}} <br>
 <p>
 Voters:
 <br>
-Username: 
+<br>
 {% for i in range(info|length) %} 
+<div class = "division">
 {% if votetype == "score" %}
-{{info[i]}}
+Username: {{info[i]}}
 {% else %}
-{{info[i][1]}} 
+Username: {{info[i][1]}} 
 {% endif %}
 <br>
 {% if mode >= 3 %}
 {% if votetype == "popularity" %}
-: {{info[i][3]}}
+{{info[i][3]}}
+<br>
 {% elif votetype == "score" %}
 {% for k in range(num|int) %}
     Option {{k+1}}: {{scores[i][k]}} points
@@ -38,6 +40,7 @@ Username:
 <br>
 {% endif %}
 {% endif %}
+</div>
 {% endfor %}
 </p>
 {% endif %}

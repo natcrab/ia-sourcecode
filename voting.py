@@ -42,7 +42,8 @@ def tallying(engine, pollid, polltype):
                 n+=1
             else:
                 break
-        temp = engine.connect().execute(text("SELECT * from Tideman WHERE pollid = :pollid"), {'pollid': pollid})
+        with engine.connect() as connection:
+            temp = connection.execute(text("SELECT * from Tideman WHERE pollid = :pollid"), {'pollid': pollid})
         for row in temp:
             votes.append(list(row))
         arr = tideman(options, votes)

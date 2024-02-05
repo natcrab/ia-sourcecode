@@ -1,7 +1,9 @@
 {% extends "content.html" %}
 {% block maincontent %}
 <form action = "/main/polls" method = "post">
-    <input id = "searchbar" name = "searchbar" type = "text" placeholder = "Search here...">
+    <input id = "searchbar" name = "searchbar" type = "text" placeholder = "Search here..." class = "menuinput">
+    <br>
+    <div class = "center">
     <label for = "searchSort">Sorting option</label>
     <select name = "searchSort" id = "searchSort">
         <option value = "New"> Creation date (newest) </option>
@@ -13,15 +15,19 @@
     <label for = "ongoing"> Ongoing polls </label>
     <input type = "checkbox" name = "status" value = "ended" id = "ended" checked>
     <label for = "ended"> Ended polls </label>
-    <button id = "searchPollName" name = "searchPollName" type = "submit">Search</button>
+    </div>
+    <br>
+    <button id = "searchPollName" name = "searchPollName" type = "submit" class = "menubutton">Search</button>
 <br>
 <br>
 {% if toDisplay|length > 0 %}
 {% for i in range(toDisplay|length) %}
 {% if toDisplay[i][8] %}
-<div id = "displaySearch{{i+1}}">
+<div id = "displaySearch{{i+1}}" class = "division">
 id: {{toDisplay[i][0]}}
+<br>
 Name: {{toDisplay[i][2]}}
+<br>
 Maker: {{toDisplay[i][1]}}
 <br>
 <h2>Question: {{toDisplay[i][4]}}</h2>
@@ -32,7 +38,8 @@ ongoing
 {% else %}
 finished
 {% endif %}
-<button id = "visitPoll{{i+1}}" name = "visitPoll{{i+1}}" type = "submit">Visit Poll</button>
+<br>
+<button id = "visitPoll{{i+1}}" name = "visitPoll{{i+1}}" type = "submit" class = "menubutton">Visit Poll</button>
 <br>
 <br>
 </div>

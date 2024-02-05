@@ -8,7 +8,7 @@
     {%endwith%}
     <form action = "/register" method = "post">
         <div>
-            <input id= "username" type= "text" name = "username" placeholder="Username:">
+            <input id= "username" type= "text" name = "username" placeholder="Username:" class = "menuinput">
             <p>
                 Username must follows these standards: <br>
                   - No spaces <br>
@@ -18,10 +18,10 @@
             </p>
         </div>
         <div>
-            <input id= "password" type = "password" name = "password" placeholder = "password:">
+            <input id= "password" type = "password" name = "password" placeholder = "password:" class = "menuinput">
         </div>
         <div>
-            <input id= "verify-password" type = "password" name = "verify-password" placeholder = "Confirm password:">
+            <input id= "verify-password" type = "password" name = "verify-password" placeholder = "Confirm password:" class = "menuinput">
         </div>
         <p>
             Password must follow these standards: <br>
@@ -30,10 +30,10 @@
             - Must include a symbol <br>
         </p>
         <div>
-            <input id= "email" type = "text" name = "email" placeholder = "email(optional): ">
+            <input id= "email" type = "text" name = "email" placeholder = "email(optional): " class = "menuinput">
         </div>
         <div>
-        <button type = "submit"> Register </button>
+        <button type = "submit" class = "menubutton"> Register </button>
         </div>
     </form>
 {% endblock %}

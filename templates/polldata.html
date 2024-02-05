@@ -3,7 +3,7 @@
 {% if pollData[13] == true and passEntered == false %}
 <form action = "/main/polls/{{pollData[0]}}" method = "post">
 Enter password here to view the poll:
-<input type = "text" name = "pollPass" id = "pollPass">
+<input type = "password" name = "pollPass" id = "pollPass">
 <button type = "submit" name = "pollPassButton" id = "pollPassButton">Submit</button>
 {% else %}
 {% if pollData[10] == true %}
@@ -41,7 +41,7 @@ Maker: {{pollData[1]}} <br>
 {% if pollData[6] == "popularity" %}
 Voting system: Popularity (most votes wins) <br>
 {% for temp in range(pollData[12]|int) %}
-<div>
+<div class = "division">
 <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
 {% if voted == 0 %}
 <button type = "submit" name = "option{{x.value}}"> Vote </button> </p>
@@ -52,7 +52,6 @@ Voting system: Popularity (most votes wins) <br>
 <button type = "submit" name = "option{{x.value}}"> Vote </button> </p>
 {% endif %}
 {% endif %}
-<br>
 Justification: {{pollData[n.value+1]}}
 {% set n.value = n.value + 2 %}
 {% set x.value = x.value + 1 %}
@@ -69,6 +68,8 @@ Justification: {{pollData[n.value+1]}}
 {% set n.value = n.value + 2 %}
 {% set x.value = x.value + 1 %}
 {% endfor %}
+<br>
+<br>
 <button id = "submitScore" type = "submit" name = "submitScore">Submit scores</button>
 
 {% elif pollData[6] == "tideman" %}
@@ -84,7 +85,8 @@ Justification: {{pollData[n.value+1]}}
 {% set x.value = x.value + 1 %}
 {% endfor %}
 <br>
-<button id = "submitTideman" type = "submit" name = "submitTideman">Submit scores</button>
+<br>
+<button id = "submitTideman" type = "submit" name = "submitTideman">Submit rankings</button>
 
 {% endif %}
 </form>
@@ -92,6 +94,13 @@ Justification: {{pollData[n.value+1]}}
 <br>
 {% if isOwner %}
 <form action = "/main/polls/{{pollData[0]}}" method = "post">
+{% if pollData[13] == True %}
+Change password: 
+<input id = "pollPassNew" name = "pollPassNew" type = "password" placeholder = "New Password:">
+<button id = "changepass" type = "submit" name = "changepass"> Change </button>
+<br>
+<br>
+{% endif %}
 <button id = "endpoll" type = "submit" name = "endpoll"> End poll </button>
 </form>
 {% endif %}

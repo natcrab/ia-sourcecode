@@ -1,1 +1,38 @@
+*{
+background-color:#222222; color:white;
+}
+input, button{
+    background-color:#111111;
+    color: white;
+}
+.menubutton{
+text-align: center;
+width: 80%;
+padding: 10px;
+margin: 10px 10%;
+}
+.menuinput{
+    text-align: left;
+    width: 55%;
+    margin: 10px 22.5%;
+    padding: 10px 5px;
+}
 
+.division{
+    margin: 10px;
+    text-align: left;
+    border: 10px #dddddd;
+    border-style: double;
+    padding: 5px;
+}
+
+.center{
+    text-align: center;
+}
+
+footer{
+    margin: 50% 0px 0px 0px;
+    text-align:center;
+    border: 10px 0px 0px 0px #dddddd;
+    border-style: dashed;
+}

@@ -2,8 +2,9 @@
 {% block maincontent %}
 <h3 id = "displayTop"> ID: {{pollData[0]}} <br>
     Maker: {{pollData[1]}} <br>
-    </h3>
+    </h3>   
     <h1 id = "displayTitle"> {{pollData[2]}} <br> </h1>
+    <div class = "division">
     <h2 id = "displayDesc">
     {{pollData[4]}}
     </h2>
@@ -21,12 +22,15 @@
     {% set x.value = x.value + 1 %}
     </div>
     {% endfor %}
+    </div>
+    <div class = "division">
     <p> Winner(s): <br>
     {% for temp in range(tallies|length - pollData[12]) %}
     <p id = "winners"> Option {{tallies[x.value-1]+1}} 
     </p>
     {% set x.value = x.value + 1 %}
     {% endfor %}
+    </div>
     </p>
 
     {% elif pollData[6] == "score" %}
@@ -38,12 +42,15 @@
     {% set x.value = x.value + 1 %}
     </div>
     {% endfor %}
+    </div>
+    <div class = "division">
     <p> Winner(s): <br>
     {% for temp in range(tallies|length - pollData[12]) %}
     <p id = "winners"> Option {{tallies[x.value-1]+1}} 
     </p>
     {% set x.value = x.value + 1 %}
     {% endfor %}
+    </div>
     </p>
 
     {% elif pollData[6] == "tideman" %}
@@ -54,16 +61,20 @@
     {% set x.value = x.value + 1 %}
     </div>
     {% endfor %}
+    </div>
     {% set x.value = 0 %}
+    <div class = "division">
     <p> Winner(s): <br>
     {% for temp in range(tallies|length) %}
     <p id = "winners"> {{tallies[x.value]}}
     </p>
     {% set x.value = x.value + 1 %}
     {% endfor %}
+    </div>
     </p>
 
     {% endif %}
+    <br>
     <form action = "/main/polls/{{pollData[0]}}" method = "post">
     <button id = "viewDetails" name = "viewDetails" type = "submit"> View details </button>
     </form>

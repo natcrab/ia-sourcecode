@@ -3,10 +3,17 @@
     <head>
         <meta charset = "utf-8">
         <meta name = "viewport" content = "initial-scale=1, width=device-width">
-        <link href="static\styles.css" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
         <title> Polling site </title>
     </head>
-    <body style="background-color:#222222; color:white">
+    <body>
         {% block site %}{% endblock %}
     </body>
+    <footer>
+        <h3>
+            Made with Flask <br>
+            by personal code ldz916 <br>
+            IB internal assessment May 2024
+        </h3>
+    </footer>
 </html>

@@ -1,16 +1,18 @@
 {% extends "layout.html" %}
 {% block site %}
-<link href="static\styles.css" rel="stylesheet">
     <form action = "/main" method = "post">
         <div>
             <button name = "logout" type = "submit">Log out </button>
         </div>
+        <br>
         <div>
             <button name = "make" type = "submit">Make your own poll</button>
         </div>
+        <br>
         <div>
             <button name = "search" type = "submit">Find polls</button>
         </div>
+        <br>
     </form>
  
     {% with mes = get_flashed_messages() %}
@@ -21,6 +23,7 @@
     {% block maincontent %}{% endblock %}
     <form action = "/main" method = "post">
         <div>
+            <br>
             <button name = "Return" type = "submit"> Return </button>
         </div>
     </form>
