@@ -43,14 +43,13 @@ from flask_login import (
     login_required
 )
 #end importing
-
+path = 'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'voters.db')
 db = SQLAlchemy()
 migrate = Migrate()
 manage = LoginManager()
 def creation():
-    app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] =\
-            'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'voters.db')
+    app = Flask(__name__)            
+    app.config['SQLALCHEMY_DATABASE_URI'] = path
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['SECRET_KEY'] = keysec
     manage.init_app(app)
@@ -60,7 +59,7 @@ def creation():
     return app
  
 app = creation()
-engine = create_engine("sqlite:///D:\Computer science internal assessment/voters.db")
+engine = create_engine(path)
 
 #end initializing application
 
