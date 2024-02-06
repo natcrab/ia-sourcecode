@@ -1,5 +1,6 @@
 #importing various libraries and framework common to Flask
 import os
+import sys
 import sqlite3
 import math
 from func import (
@@ -43,7 +44,6 @@ from flask_login import (
 )
 #end importing
 
-#initializing application
 db = SQLAlchemy()
 migrate = Migrate()
 manage = LoginManager()
@@ -261,9 +261,9 @@ def contentpage():
             return redirect("/home")
         elif request.form.get("Return") is not None:
             return redirect("/main") #Go to content page
-
-@login_required    
+    
 @app.route("/main/makepoll", methods = ["GET", "POST"])
+@login_required
 def makepoll():
     if request.method == "GET":
         return render_template("pollinit.html")
@@ -374,8 +374,8 @@ def makepoll():
                 flash("Poll added to database!")
                 return redirect("/main")
             
-@login_required
-@app.route("/main/searchpoll/", methods = ["GET", "POST"])  
+@app.route("/main/searchpoll/", methods = ["GET", "POST"]) 
+@login_required 
 def searchpoll():
     if request.method == "GET":
         return render_template("searchpoll.html")
@@ -390,8 +390,8 @@ def searchpoll():
         if request.form.get("pollNameButton") is not None:
             return redirect("/main/polls")
 
-@login_required
 @app.route("/main/polls", methods = ["GET", "POST"])
+@login_required
 def searchresults():
     if request.method == "GET":
         results = searchres(engine, "")
@@ -458,8 +458,8 @@ def searchresults():
 
 
 
-@login_required
 @app.route("/main/polls/<pollId>", methods = ["GET", "POST"])
+@login_required
 def pollDisplay(pollId):
     pollData = getpoll(engine, pollId)
     passEntered = False
@@ -589,8 +589,9 @@ def pollDisplay(pollId):
             if request.form.get("viewDetails") is not None:
                 return redirect(url_for("pollmore", pollId = pollId))
         
-@login_required
+
 @app.route("/main/polls/<pollId>/more", methods = ["GET", "POST"]) #poll details
+@login_required
 def pollmore(pollId):
     with engine.connect() as connection:
         connect = connection.execute(text("SELECT * FROM Polls WHERE pollid = :pollid"), {'pollid': pollId}).fetchone()
