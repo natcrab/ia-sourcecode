@@ -131,7 +131,7 @@ class Tideman(db.Model):
     Counter = db.Column(db.Integer, primary_key = True, unique = True)
     Userid = db.Column(db.Integer)
     pollid = db.Column(db.String)
-    rank1 = db.Column(db.String)  #index 4
+    rank1 = db.Column(db.String)  #index 3
     rank2 = db.Column(db.String)
     rank3 = db.Column(db.String)
     rank4 = db.Column(db.String)
