@@ -249,7 +249,11 @@ def login():
 @app.route("/main", methods = ["GET", "POST"])
 def contentpage():
     if request.method == "GET":
-        return render_template("content.html")
+        if current_user.username is not None:
+            user = current_user.username
+        else:
+            user = ""
+        return render_template("content.html", user = user)
     elif request.method == "POST":
         if request.form.get("make") is not None:
             return redirect("/main/makepoll") #create poll page
