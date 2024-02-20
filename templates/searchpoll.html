@@ -7,6 +7,36 @@
     <br>
     <br>
     Display public polls:
-    <button id = "pollNameButton" name = "pollNameButton" type = "submit">Go</button>
+    <button id = "pollNameButton" name = "pollNameButton" type = "submit">Go to page</button>
+
+{% if toDisplay|length > 0 %}
+<br>
+<div class = "division">
+<h2 class = "center"> My Polls </h2>
+{% for i in range(toDisplay|length) %}
+<div id = "displaySearch{{i+1}}" class = "division">
+id: {{toDisplay[i][0]}}
+<br>
+Name: {{toDisplay[i][2]}}
+<br>
+Maker: {{toDisplay[i][1]}}
+<br>
+<h2>Question: {{toDisplay[i][4]}}</h2>
+<input id = "visitPollId{{i+1}}" name = "visitPollId{{i+1}}" type = "text" value = "{{toDisplay[i][0]}}" hidden>
+Status: 
+{% if toDisplay[i][15] %}
+ongoing
+{% else %}
+finished
+{% endif %}
+<br>
+<button id = "visitPoll{{i+1}}" name = "visitPoll{{i+1}}" type = "submit" class = "menubutton">Visit Poll</button>
+<br>
+<br>
+</div>
+{% endfor %}
+</div>
+{% endif %}
+<input id = "numDisplay" name = "numDisplay" type = "number" value = {{toDisplay|length}} hidden>
 </form>
 {%endblock%}
