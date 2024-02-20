@@ -381,7 +381,12 @@ def makepoll():
 @login_required 
 def searchpoll():
     if request.method == "GET":
-        return render_template("searchpoll.html")
+        mypolls = []
+        with engine.connect() as connection:
+            Mpolls = connection.execute(text("SELECT pollId from polls where creator = :username"), {'username': current_user.username})
+        for i in Mpolls:
+            mypolls.append(getpoll(engine, i.pollId))
+        return render_template("searchpoll.html", toDisplay = mypolls)
     if request.method == "POST":
         if request.form.get("pollIdButton") is not None: #Search for polls using id
             if not duped_pollId(engine, request.form.get("searchPollId")):
@@ -392,6 +397,11 @@ def searchpoll():
                 return redirect(url_for("pollDisplay", pollId = result))
         if request.form.get("pollNameButton") is not None:
             return redirect("/main/polls")
+        numofPolls = int(request.form.get("numDisplay"))
+        for i in range(numofPolls):
+            if request.form.get("".join(["visitPoll", str(i+1)])) is not None: #visit the poll clicked on
+                pollId = request.form.get("".join(["visitPollId", str(i+1)]))
+                return redirect(url_for("pollDisplay", pollId = pollId))
 
 @app.route("/main/polls", methods = ["GET", "POST"])
 @login_required
