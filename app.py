@@ -383,7 +383,7 @@ def searchpoll():
     if request.method == "GET":
         mypolls = []
         with engine.connect() as connection:
-            Mpolls = connection.execute(text("SELECT pollId from polls where creator = :username"), {'username': current_user.username})
+            Mpolls = connection.execute(text("SELECT pollId from polls where creator = :username ORDER BY pollStart DESC LIMIT 100"), {'username': current_user.username})
         for i in Mpolls:
             mypolls.append(getpoll(engine, i.pollId))
         return render_template("searchpoll.html", toDisplay = mypolls)
