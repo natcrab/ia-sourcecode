@@ -126,9 +126,13 @@ def pollpassword(engine, pollid, password):
     for row in checkpass:
         return (check_password_hash(row.password, password))
     
-def pollpopularity(engine, pollid):
-    with engine.connect() as connection:
-        num = connection.execute(text("SELECT COUNT (*) From Votes WHERE pollid = :pollid"), {'pollid': pollid}).fetchone()
+def pollpopularity(engine, pollid, votesystem):
+    if votesystem == "tideman":
+        with engine.connect() as connection:
+            num = connection.execute(text("SELECT COUNT (DISTINCT Userid) From Tideman WHERE pollid = :pollid"), {'pollid': pollid}).fetchone() 
+    else:
+        with engine.connect() as connection:
+            num = connection.execute(text("SELECT COUNT (DISTINCT Userid) From Votes WHERE pollid = :pollid"), {'pollid': pollid}).fetchone()
     return num
 
 def gettime(engine, pollid):
