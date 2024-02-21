@@ -245,8 +245,8 @@ def login():
 #login page end#
 
 #Content page 
-@login_required
 @app.route("/main", methods = ["GET", "POST"])
+@login_required
 def contentpage():
     if request.method == "GET":
         if current_user.username is not None:
