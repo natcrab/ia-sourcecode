@@ -454,11 +454,15 @@ def searchresults():
                     case "Popularity":
                         length = len(toDisplay)
                         for i in range(length):
+                            swapped = False
                             for k in range(0, length - i - 1, 1):
-                                if pollpopularity(engine, toDisplay[k][0]) < pollpopularity(engine, toDisplay[k+1][0]):
+                                if pollpopularity(engine, toDisplay[k][0], toDisplay[k][6]) < pollpopularity(engine, toDisplay[k+1][0], toDisplay[k+1][6]):
                                     temp = toDisplay[k] 
                                     toDisplay[k] = toDisplay[k+1]
                                     toDisplay[k+1] = temp
+                                    swapped = True
+                            if swapped == False:
+                                break
                     case _:
                         pass                
                 return render_template("pollfind.html", toDisplay = toDisplay)
