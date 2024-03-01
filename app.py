@@ -411,11 +411,6 @@ def searchresults():
         toDisplay = []
         for i in results:
             toDisplay.append(getpoll(engine, i)) #Get all polls to be displayed by default
-            n = len(toDisplay)
-            for i in range(math.floor(n/2)): #Sort all polls from newest first by defaukt
-                temp = toDisplay[i]
-                toDisplay[i] = toDisplay[n-1-i]
-                toDisplay[n-1-i] = temp
         return render_template("pollfind.html", toDisplay = toDisplay)
     if request.method == "POST":
         if request.form.get("searchPollName") is not None:
@@ -445,7 +440,7 @@ def searchresults():
 
                 #Rearrange the polls based on sorting mode
                 match sortmode:
-                    case "New": 
+                    case "Old": 
                         n = len(toDisplay)
                         for i in range(math.floor(n/2)):
                             temp = toDisplay[i]
