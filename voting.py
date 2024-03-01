@@ -115,7 +115,7 @@ def addCounter(engine, polltype):
 def searchres(engine, keyword):   
     result = []
     with engine.connect() as connection:
-        getDetails = connection.execute(text("SELECT pollId FROM polls WHERE (LOWER(pollname) LIKE :keyword OR LOWER(pollDescription) LIKE :keyword OR LOWER(pollQuestion) LIKE :keyword) LIMIT 50"), {'keyword': "%" + keyword + "%"})
+        getDetails = connection.execute(text("SELECT pollId FROM polls WHERE (LOWER(pollname) LIKE :keyword OR LOWER(pollDescription) LIKE :keyword OR LOWER(pollQuestion) LIKE :keyword) LIMIT 50"), {'keyword': "%" + keyword.lower() + "%"})
         for row in getDetails:
             result.append(row.pollId)
         return result
