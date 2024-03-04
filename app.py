@@ -194,7 +194,7 @@ def register():
             flash("Please enter username / password") 
             return redirect("/register") 
         elif (not valid_username(username)):
-            flash("Username too long/ contains illegal characters: space")
+            flash("Username too long/ contains illegal characters: space or symbols")
             return redirect("/register")
         elif (duped_username(engine, username)):
             flash("Username already exist")
