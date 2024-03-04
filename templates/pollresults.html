@@ -1,6 +1,6 @@
 {% extends "content.html" %}
 {% block maincontent %}
-<h3 id = "displayTop"> ID: {{pollData[0]}} <br>
+    <h3 id = "displayTop"> ID: {{pollData[0]}} <br>
     Maker: {{pollData[1]}} <br>
     </h3>   
     <h1 id = "displayTitle"> {{pollData[2]}} <br> </h1>
@@ -13,65 +13,66 @@
     </p>
     {% set n = namespace(value = 16) %}
     {% set x = namespace(value = 1) %}
+
     {% if pollData[6] == "popularity" %}
 
-    {% for temp in range(pollData[12]|int) %}
-    <div>
-    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}} | {{tallies[x.value-1]}} vote(s)</p>
-    {% set n.value = n.value + 2 %}
-    {% set x.value = x.value + 1 %}
-    </div>
-    {% endfor %}
-    </div>
-    <div class = "division">
-    <p> Winner(s): <br>
-    {% for temp in range(tallies|length - pollData[12]) %}
-    <p id = "winners"> Option {{tallies[x.value-1]+1}} 
-    </p>
-    {% set x.value = x.value + 1 %}
-    {% endfor %}
-    </div>
-    </p>
+        {% for temp in range(pollData[12]|int) %}
+            <div>
+            <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}} | {{tallies[x.value-1]}} vote(s)</p>
+            {% set n.value = n.value + 2 %}
+            {% set x.value = x.value + 1 %}
+            </div>
+        {% endfor %}
+        </div>
+        <div class = "division">
+        <p> Winner(s): <br>
+        {% for temp in range(tallies|length - pollData[12]) %}
+            <p id = "winners"> Option {{tallies[x.value-1]+1}} 
+            </p>
+            {% set x.value = x.value + 1 %}
+        {% endfor %}
+        </div>
+        </p>
 
     {% elif pollData[6] == "score" %}
 
-    {% for temp in range(pollData[12]|int) %}
-    <div>
-    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}} | score: {{tallies[x.value-1]}} </p>
-    {% set n.value = n.value + 2 %}
-    {% set x.value = x.value + 1 %}
-    </div>
-    {% endfor %}
-    </div>
-    <div class = "division">
-    <p> Winner(s): <br>
-    {% for temp in range(tallies|length - pollData[12]) %}
-    <p id = "winners"> Option {{tallies[x.value-1]+1}} 
-    </p>
-    {% set x.value = x.value + 1 %}
-    {% endfor %}
-    </div>
-    </p>
+        {% for temp in range(pollData[12]|int) %}
+            <div>
+            <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}} | score: {{tallies[x.value-1]}} </p>
+            {% set n.value = n.value + 2 %}
+            {% set x.value = x.value + 1 %}
+            </div>
+        {% endfor %}
+        </div>
+        <div class = "division">
+        <p> Winner(s): <br>
+        {% for temp in range(tallies|length - pollData[12]) %}
+            <p id = "winners"> Option {{tallies[x.value-1]+1}} 
+            </p>
+            {% set x.value = x.value + 1 %}
+        {% endfor %}
+        </div>
+        </p>
 
     {% elif pollData[6] == "tideman" %}
-    {% for temp in range(pollData[12]|int) %}
-    <div>
-    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}</p>
-    {% set n.value = n.value + 2 %}
-    {% set x.value = x.value + 1 %}
-    </div>
-    {% endfor %}
-    </div>
-    {% set x.value = 0 %}
-    <div class = "division">
-    <p> Winner(s): <br>
-    {% for temp in range(tallies|length) %}
-    <p id = "winners"> {{tallies[x.value]}}
-    </p>
-    {% set x.value = x.value + 1 %}
-    {% endfor %}
-    </div>
-    </p>
+        {% for temp in range(pollData[12]|int) %}
+            <div>
+            <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}</p>
+            {% set n.value = n.value + 2 %}
+            {% set x.value = x.value + 1 %}
+            </div>
+        {% endfor %}
+        </div>
+        {% set x.value = 0 %}
+        <div class = "division">
+        <p> Winner(s): <br>
+        {% for temp in range(tallies|length) %}
+            <p id = "winners"> {{tallies[x.value]}}
+            </p>
+            {% set x.value = x.value + 1 %}
+        {% endfor %}
+        </div>
+        </p>
 
     {% endif %}
     <br>
