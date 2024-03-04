@@ -1,50 +1,50 @@
 {% extends "content.html" %}
 {% block maincontent %}
-<div id = "topmore">
-Id: {{pollId}} <br>
-</div>
-<p>
-Made at {{start}}  <br>
-Ended at {{ended}} 
-(Went on for {{ongoing}})<br>
-(Times are in UTC timezone)
-</p>
-Voting system: {{votetype}} <br>
-{% if mode >= 2 %}
-<p>
-Voters:
-<br>
-<br>
-{% for i in range(info|length) %} 
-<div class = "division">
-{% if votetype == "score" %}
-Username: {{info[i]}}
-{% else %}
-Username: {{info[i][1]}} 
-{% endif %}
-<br>
-{% if mode >= 3 %}
-{% if votetype == "popularity" %}
-{{info[i][3]}}
-<br>
-{% elif votetype == "score" %}
-{% for k in range(num|int) %}
-    Option {{k+1}}: {{scores[i][k]}} points
-    <br>
-{% endfor %}
-{% elif votetype == "tideman" %}
-{% for k in range (num|int) %}
-    Rank {{k+1}}: {{info[i][k+3]}}
-    <br>
-{% endfor %}
-<br>
-{% endif %}
-{% endif %}
-</div>
-{% endfor %}
-</p>
-{% endif %}
-<form action = "/main/polls/{{pollId}}/more" method = "post">
-    <button name = "back" type = "submit">Go back to poll</button>
-</form>
+    <div id = "topmore">
+    Id: {{pollId}} <br>
+    </div>
+    <p>
+    Made at {{start}}  <br>
+    Ended at {{ended}} 
+    (Went on for {{ongoing}})<br>
+    (Times are in UTC timezone)
+    </p>
+    Voting system: {{votetype}} <br>
+    {% if mode >= 2 %}
+        <p>
+        Voters:
+        <br>
+        <br>
+        {% for i in range(info|length) %} 
+            <div class = "division">
+            {% if votetype == "score" %}
+                Username: {{info[i]}}
+            {% else %}
+                Username: {{info[i][1]}} 
+            {% endif %}
+            <br>
+            {% if mode >= 3 %}
+                {% if votetype == "popularity" %}
+                    {{info[i][3]}}
+                    <br>
+                {% elif votetype == "score" %}
+                    {% for k in range(num|int) %}
+                    Option {{k+1}}: {{scores[i][k]}} points
+                    <br>
+                    {% endfor %}
+                {% elif votetype == "tideman" %}
+                    {% for k in range (num|int) %}
+                        Rank {{k+1}}: {{info[i][k+3]}}
+                        <br>
+                    {% endfor %}
+                <br>
+                {% endif %}
+            {% endif %}
+            </div>
+        {% endfor %}
+        </p>
+    {% endif %}
+    <form action = "/main/polls/{{pollId}}/more" method = "post">
+        <button name = "back" type = "submit">Go back to poll</button>
+    </form>
 {% endblock %}
