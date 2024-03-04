@@ -1,108 +1,110 @@
 {% extends "content.html" %}
 {% block maincontent %}
-{% if pollData[13] == true and passEntered == false %}
-<form action = "/main/polls/{{pollData[0]}}" method = "post">
-Enter password here to view the poll:
-<input type = "password" name = "pollPass" id = "pollPass">
-<button type = "submit" name = "pollPassButton" id = "pollPassButton">Submit</button>
-{% else %}
-{% if pollData[10] == true %}
-<h3> Poll ends when the maker chooses to end it </h3>
-{% else %}
-<h3> Time Remaining: {{Remains}} </h3>
-{% endif %}
-<h3 id = "displayTop"> ID: {{pollData[0]}} <br>
-Maker: {{pollData[1]}} <br>
-</h3>
-<h1 id = "displayTitle"> {{pollData[2]}} <br> </h1>
-<h2 id = "displayDesc">
-{{pollData[4]}}
-</h2>
-<p>
-    {{pollData[3]}}
-</p>
-{% if pollData[5] == "Show" %}
-<p>
-    Note: Other people can see what you have voted for on this poll
-</p>
-{% elif pollData[5] == "ShowHalf" %}
-<p>
-    Note: Other people can see you have voted on this poll, but not what you voted for
-</p>
-{% elif pollData[5] == "Hide" %}
-<p>
-    Note: Your votes and participation on this poll will be private
-</p>
-{% endif %}
-</form>
-<form action = "/main/polls/{{pollData[0]}}" method = "post"> 
-{% set n = namespace(value = 16) %}
-{% set x = namespace(value = 1) %}
-{% if pollData[6] == "popularity" %}
-Voting system: Popularity (most votes wins) <br>
-{% for temp in range(pollData[12]|int) %}
-<div class = "division">
-<p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
-{% if voted == 0 %}
-<button type = "submit" name = "option{{x.value}}"> Vote </button> </p>
-{% elif voted == 1 %}
-{% if x.value == optvoted|int %}
-<button type = "button" name = "option{{x.value}}"> Voted </button> </p>
-{% else %}
-<button type = "submit" name = "option{{x.value}}"> Vote </button> </p>
-{% endif %}
-{% endif %}
-Justification: {{pollData[n.value+1]}}
-{% set n.value = n.value + 2 %}
-{% set x.value = x.value + 1 %}
-</div>
-{% endfor %}
+    {% if pollData[13] == true and passEntered == false %}
+        <form action = "/main/polls/{{pollData[0]}}" method = "post">
+        Enter password here to view the poll:
+        <input type = "password" name = "pollPass" id = "pollPass">
+        <button type = "submit" name = "pollPassButton" id = "pollPassButton">Submit</button>
+        </form>
+    {% else %}
+        {% if pollData[10] == true %}
+            <h3> Poll ends when the maker chooses to end it </h3>
+        {% else %}
+            <h3> Time Remaining: {{Remains}} </h3>
+        {% endif %}
+        <h3 id = "displayTop"> ID: {{pollData[0]}} <br>
+        Maker: {{pollData[1]}} <br>
+        </h3>
+        <h1 id = "displayTitle"> {{pollData[2]}} <br> </h1>
+        <h2 id = "displayDesc">
+        {{pollData[4]}}
+        </h2>
+        <p>
+            {{pollData[3]}}
+        </p>
+        {% if pollData[5] == "Show" %}
+            <p>
+                Note: Other people can see what you have voted for on this poll
+            </p>
+        {% elif pollData[5] == "ShowHalf" %}
+            <p>
+                Note: Other people can see you have voted on this poll, but not what you voted for
+            </p>
+        {% elif pollData[5] == "Hide" %}
+            <p>
+                Note: Your votes and participation on this poll will be private
+            </p>
+        {% endif %}
+        <form action = "/main/polls/{{pollData[0]}}" method = "post"> 
+            {% set n = namespace(value = 16) %}
+            {% set x = namespace(value = 1) %}
+            {% if pollData[6] == "popularity" %}
+            Voting system: Popularity (most votes wins) <br>
+            {% for temp in range(pollData[12]|int) %}
+                <div class = "division">
+                <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
+                {% if voted == 0 %}
+                    <button type = "submit" name = "option{{x.value}}"> Vote </button> </p>
+                {% elif voted == 1 %}
+                    {% if x.value == optvoted|int %}
+                        <button type = "button" name = "option{{x.value}}"> Voted </button> </p>
+                    {% else %}
+                        <button type = "submit" name = "option{{x.value}}"> Vote </button> </p>
+                    {% endif %}
+                {% endif %}
+                Justification: {{pollData[n.value+1]}}
+                {% set n.value = n.value + 2 %}
+                {% set x.value = x.value + 1 %}
+                </div>
+            {% endfor %}
 
-{% elif pollData[6] == "score" %}
-Voting system: Score <a href ="https://en.wikipedia.org/wiki/Score_voting" target = "_blank">Read about the system here</a> <br>
-{% for temp in range(pollData[12]|int) %}
-<p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
-<input id = "score{{x.value}}" type = "number" name = "score{{x.value}}"
- min = {{pollData[36]}} max = {{pollData[37]}} step = 1 value = {{pollData[36]}}> </p>
-Justification: {{pollData[n.value+1]}}
-{% set n.value = n.value + 2 %}
-{% set x.value = x.value + 1 %}
-{% endfor %}
-<br>
-<br>
-<button id = "submitScore" type = "submit" name = "submitScore">Submit scores</button>
+            {% elif pollData[6] == "score" %}
+                Voting system: Score <a href ="https://en.wikipedia.org/wiki/Score_voting" target = "_blank">Read 
+                    about the system here</a> <br>
+                {% for temp in range(pollData[12]|int) %}
+                    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
+                    <input id = "score{{x.value}}" type = "number" name = "score{{x.value}}"
+                    min = {{pollData[36]}} max = {{pollData[37]}} step = 1 value = {{pollData[36]}}> </p>
+                    Justification: {{pollData[n.value+1]}}
+                    {% set n.value = n.value + 2 %}
+                    {% set x.value = x.value + 1 %}
+                {% endfor %}
+                <br>
+                <br>
+                <button id = "submitScore" type = "submit" name = "submitScore">Submit scores</button>
 
-{% elif pollData[6] == "tideman" %}
-Voting system: Tideman <a href ="https://en.wikipedia.org/wiki/Ranked_pairs" target = "_blank">Read about the system here</a> <br>
-Rank the options from best to worst (1 for best, {{pollData[12]}} for worst)
-Each option must receive a unique ranking
-{% for temp in range(pollData[12]|int) %}
-<p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
-<input id = "tideman{{x.value}}" type = "number" name = "tideman{{x.value}}"
-min = 1 max =  {{pollData[12]|int}} step = 1 value = {{x.value}}> </p>
-Justification: {{pollData[n.value+1]}}
-{% set n.value = n.value + 2 %}
-{% set x.value = x.value + 1 %}
-{% endfor %}
-<br>
-<br>
-<button id = "submitTideman" type = "submit" name = "submitTideman">Submit rankings</button>
+            {% elif pollData[6] == "tideman" %}
+                Voting system: Tideman <a href ="https://en.wikipedia.org/wiki/Ranked_pairs" target = "_blank">Read 
+                    about the system here</a> <br>
+                Rank the options from best to worst (1 for best, {{pollData[12]}} for worst)
+                Each option must receive a unique ranking
+                {% for temp in range(pollData[12]|int) %}
+                    <p id = "displayChoices"> Option {{x.value}}: {{pollData[n.value]}}
+                    <input id = "tideman{{x.value}}" type = "number" name = "tideman{{x.value}}"
+                    min = 1 max =  {{pollData[12]|int}} step = 1 value = {{x.value}}> </p>
+                    Justification: {{pollData[n.value+1]}}
+                    {% set n.value = n.value + 2 %}
+                    {% set x.value = x.value + 1 %}
+                {% endfor %}
+                <br>
+                <br>
+                <button id = "submitTideman" type = "submit" name = "submitTideman">Submit rankings</button>
 
-{% endif %}
-</form>
-<br>
-<br>
-{% if isOwner %}
-<form action = "/main/polls/{{pollData[0]}}" method = "post">
-{% if pollData[13] == True %}
-Change password: 
-<input id = "pollPassNew" name = "pollPassNew" type = "password" placeholder = "New Password:">
-<button id = "changepass" type = "submit" name = "changepass"> Change </button>
-<br>
-<br>
-{% endif %}
-<button id = "endpoll" type = "submit" name = "endpoll"> End poll </button>
-</form>
-{% endif %}
-{% endif %}
+            {% endif %}
+        </form>
+        <br>
+        <br>
+        {% if isOwner %}
+            <form action = "/main/polls/{{pollData[0]}}" method = "post">
+            {% if pollData[13] == True %}
+                Change password: 
+                <input id = "pollPassNew" name = "pollPassNew" type = "password" placeholder = "New Password:">
+                <button id = "changepass" type = "submit" name = "changepass"> Change </button>
+                <br>
+                <br>
+            {% endif %}
+            <button id = "endpoll" type = "submit" name = "endpoll"> End poll </button>
+            </form>
+        {% endif %}
+    {% endif %}
 {% endblock %}
